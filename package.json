@@ -1,0 +1,32 @@
+{
+  "name": "mongo-proto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "seed": "ts-node -r dotenv/config src/seed.ts",
+    "script": "ts-node -r dotenv/config src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tianhuil/mongo-proto.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tianhuil/mongo-proto/issues"
+  },
+  "homepage": "https://github.com/tianhuil/mongo-proto#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "mongodb": "^4.2.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^5.8.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  }
+}
