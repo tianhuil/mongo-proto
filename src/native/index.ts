@@ -38,6 +38,8 @@ const main = async () => {
         console.log(post)
       }
     })
+  } catch (e) {
+    console.log(e)
   } finally {
     db.close()
   }

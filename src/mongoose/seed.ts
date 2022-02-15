@@ -1,51 +1,36 @@
-import { connect, model, Schema } from 'mongoose'
+import { connect } from 'mongoose'
+import { createSchema, Type, typedModel } from 'ts-mongoose'
 
-// 1. Create an interface representing a document in MongoDB.
-interface User {
-  date: Date
-  name: string
-  email: string
-  avatar?: string
-  address: {
-    street: string
-    city: string
-    state: string
-  }
-}
+const AddressSchema = createSchema({
+  street: Type.string({ required: true }),
+  city: Type.string({ required: true, slkdjf: false }),
+  state: Type.string({ required: true, abcd: false }),
+})
 
-// 2. Create a Schema corresponding to the document interface.
-const schema = new Schema<User>({
-  date: { type: Date, required: true },
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  avatar: String,
-  address: {
-    type: {
-      street: String,
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-    },
-    required: true,
-  },
+const UserSchema = createSchema({
+  name: Type.string({ required: true }),
+  email: Type.string({ required: true }),
+  avatar: Type.string(),
+  address: Type.schema({ required: true }).of(AddressSchema),
 })
 
 // 3. Create a Model.
-const UserModel = model<User>('User', schema)
-
-UserModel.aggregate()
+const UserModel = typedModel('User', UserSchema)
 
 run().catch((err) => console.log(err))
 
 async function run(): Promise<void> {
   // 4. Connect to MongoDB
-  await connect(process.env.MONGO_URL || '')
+  const db = await connect(process.env.MONGO_URL || '')
 
-  const doc = new UserModel({
-    name: 'Bill',
-    email: 'bill@initech.com',
-    avatar: 'https://i.imgur.com/dM7Thhn.png',
-  })
-  await doc.save()
-
-  console.log(doc.email) // 'bill@initech.com'
+  try {
+    const doc = new UserModel({
+      name: 'Bill',
+      email: 'bill@initech.com',
+      avatar: 'https://i.imgur.com/dM7Thhn.png',
+    })
+    await doc.save()
+  } finally {
+    db.disconnect()
+  }
 }

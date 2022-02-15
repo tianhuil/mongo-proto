@@ -8,7 +8,6 @@ const main = async () => {
       {
         name: 'Alice',
         rating: 2,
-        nickName: 'A',
         contact: { email: 'alice@example.com', phone: '+1234' },
       },
       { name: 'Bob', rating: 2, contact: { email: 'bob@example.com' } },
@@ -22,6 +21,8 @@ const main = async () => {
       { title: 'b', text: 'b', authorId: aliceId },
       { title: 'c', text: 'c', authorId: bobId },
     ])
+  } catch (e) {
+    console.log(e)
   } finally {
     db.close()
   }
