@@ -6,7 +6,8 @@
   "scripts": {
     "seed": "ts-node -r dotenv/config src/mongoose/seed.ts",
     "seed:native": "ts-node -r dotenv/config src/native/seed.ts",
-    "script:native": "ts-node -r dotenv/config src/native/index.ts"
+    "script:native": "ts-node -r dotenv/config src/native/index.ts",
+    "indices:native": "ts-node -r dotenv/config src/native/indices.ts"
   },
   "repository": {
     "type": "git",
@@ -19,9 +20,10 @@
   },
   "homepage": "https://github.com/tianhuil/mongo-proto#readme",
   "dependencies": {
+    "@google-cloud/firestore": "^5.0.2",
     "@tsed/mongoose": "^6.102.1",
     "dotenv": "^10.0.0",
-    "mongodb": "^4.2.2",
+    "mongodb": "^4.3.1",
     "ts-mongoose": "^0.0.24"
   },
   "devDependencies": {
