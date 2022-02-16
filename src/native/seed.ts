@@ -8,6 +8,7 @@ const main = async () => {
       {
         name: 'Alice',
         rating: 2,
+        date: new Date(),
         contact: { email: 'alice@example.com', phone: '+1234' },
       },
       { name: 'Bob', rating: 2, contact: { email: 'bob@example.com' } },

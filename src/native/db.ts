@@ -10,6 +10,7 @@ export interface User {
   name: string
   nickName?: string
   rating: number
+  date?: Date
   contact: {
     email: string
     phone?: string

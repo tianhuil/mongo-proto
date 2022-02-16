@@ -15,10 +15,11 @@ const main = async () => {
     await timer(async () => {
       const cursor = await db.user
         .find({ name: 'Alice' })
-        .project<Pick<User, 'name'>>({ name: 1 })
+        .sort({ name: 1 })
+        .project<Pick<User, 'name' | 'date'>>({ name: 1, date: 1 })
 
       for await (const post of cursor) {
-        console.log(post)
+        console.log(post, post.date instanceof Date)
       }
     })
 
