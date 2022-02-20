@@ -1022,9 +1022,8 @@ export const mkTsCollection = <ICollection>(
     get(target, property: string) {
       if (property === 'dangerous') {
         return target
+      } else {
+        return target[property as keyof typeof target]
       }
     },
   }) as TsCollection<ICollection>
-
-const foo = {} as TsCollection
-foo.updateOne
