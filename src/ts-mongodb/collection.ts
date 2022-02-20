@@ -9,14 +9,12 @@ import {
   ChangeStreamOptions,
   CollationOptions,
   Collection,
-  CollectionOptions,
   CollStats,
   CollStatsOptions,
   Condition,
   CountDocumentsOptions,
   CountOptions,
   CreateIndexesOptions,
-  Db,
   DeleteOptions,
   DeleteResult,
   DistinctOptions,
@@ -182,7 +180,7 @@ export declare type TsFilter<TSchema extends Document> =
       >
     } & TsRootFilterOperators<WithId<TSchema>>)
 
-interface TsCollection<TSchema extends Document = Document>
+export interface TsCollection<TSchema extends Document = Document>
   extends Collection<TSchema> {
   dangerous: Collection<TSchema>
 
@@ -1012,18 +1010,3 @@ interface TsCollection<TSchema extends Document = Document>
     callback: Callback<number>
   ): Promise<number> | void
 }
-
-export const mkTsCollection = <ICollection>(
-  db: Db,
-  name: string,
-  options?: CollectionOptions
-) =>
-  new Proxy(db.collection<ICollection>(name, options), {
-    get(target, property: string) {
-      if (property === 'dangerous') {
-        return target
-      } else {
-        return target[property as keyof typeof target]
-      }
-    },
-  }) as TsCollection<ICollection>
