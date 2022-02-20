@@ -23,7 +23,7 @@
     "@google-cloud/firestore": "^5.0.2",
     "@tsed/mongoose": "^6.102.1",
     "dotenv": "^10.0.0",
-    "mongodb": "^4.3.1",
+    "mongodb": "4.3.1",
     "ts-mongoose": "^0.0.24"
   },
   "devDependencies": {
@@ -34,5 +34,5 @@
     "mongoose": "^6.1.4",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
-  }
+  },
 }
