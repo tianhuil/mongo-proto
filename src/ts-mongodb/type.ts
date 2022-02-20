@@ -1,13 +1,32 @@
 /// <reference types="node" />
 
 import type { DeserializeOptions, ObjectIdLike, SerializeOptions } from 'bson'
-import { Binary, BSONRegExp, BSONSymbol, Code, DBRef, Decimal128, Document, Double, Int32, Long, Map as Map_2, MaxKey, MinKey, ObjectId, Timestamp } from 'bson'
+import {
+  Binary,
+  BSONRegExp,
+  BSONSymbol,
+  Code,
+  DBRef,
+  Decimal128,
+  Document,
+  Double,
+  Int32,
+  Long,
+  Map as Map_2,
+  MaxKey,
+  MinKey,
+  ObjectId,
+  Timestamp,
+} from 'bson'
 import type { SrvRecord } from 'dns'
 import { EventEmitter } from 'events'
 import type { Socket, TcpNetConnectOpts } from 'net'
 import { Readable, Writable } from 'stream'
-import type { ConnectionOptions as ConnectionOptions_2, TLSSocket, TLSSocketOptions } from 'tls'
-import Denque = require('denque')
+import type {
+  ConnectionOptions as ConnectionOptions_2,
+  TLSSocket,
+  TLSSocketOptions,
+} from 'tls'
 
 /** @public */
 export declare abstract class AbstractCursor<
@@ -488,9 +507,7 @@ export declare class AggregationCursor<
    * }});
    * ```
    */
-  project<T extends Document = Document>(
-    $project: Document
-  ): AggregationCursor<T>
+  project<T extends TSchema>($project: Projection<T>): AggregationCursor<T>
   /** Add a lookup stage to the aggregation pipeline */
   lookup($lookup: Document): this
   /** Add a redact stage to the aggregation pipeline */
@@ -498,7 +515,7 @@ export declare class AggregationCursor<
   /** Add a skip stage to the aggregation pipeline */
   skip($skip: number): this
   /** Add a sort stage to the aggregation pipeline */
-  sort($sort: Sort): this
+  sort($sort: Sort<TSchema>): this
   /** Add a unwind stage to the aggregation pipeline */
   unwind($unwind: Document | string): this
   /** @deprecated Add a geoNear stage to the aggregation pipeline */
@@ -651,31 +668,12 @@ export declare interface AutoEncryptionOptions {
       /** The client secret to authenticate a registered application */
       clientSecret: string
       /**
-export { Binary }
-export { BSONRegExp }
-export { BSONSymbol }
-export { Code }
-/* Excluded from this release type: DbPrivate */
-export { DBRef }
-export { Decimal128 }
-export { Document }
-export { Double }
-export { Int32 }
-export { Long }
-export { Map_2 as Map }
-export { MaxKey }
-/* Excluded from this release type: MessageStream */
-/* Excluded from this release type: MessageStreamOptions */
-export { MinKey }
-export { ObjectId }
-export { Promise_2 as Promise }
-export { Timestamp }
-/* Excluded from this release type: WriteProtocolMessageType */
-export { }
+       * If present, a host with optional port. E.g. "example.com" or "example.com:443".
        * This is optional, and only needed if customer is using a non-commercial Azure instance
        * (e.g. a government or China account, which use different URLs).
        * Defaults to "login.microsoftonline.com"
        */
+      identityPlatformEndpoint?: string | undefined
     }
     /** Configuration options for using 'gcp' as your KMS provider */
     gcp?: {
@@ -688,6 +686,7 @@ export { }
        * Defaults to "oauth2.googleapis.com"
        */
       endpoint?: string | undefined
+    }
   }
   /**
    * A map of namespaces to a local JSON schema for encryption
@@ -748,14 +747,32 @@ export declare const BatchType: Readonly<{
 export declare type BatchType = typeof BatchType[keyof typeof BatchType]
 
 export { Binary }
+export { BSONRegExp }
+export { BSONSymbol }
+/* Excluded from this release type: DbPrivate */
+export { DBRef }
+export { Decimal128 }
+export { Document }
+export { Double }
+export { Int32 }
+export { Long }
+export { Map_2 as Map }
+export { MaxKey }
+/* Excluded from this release type: MessageStream */
+/* Excluded from this release type: MessageStreamOptions */
+export { MinKey }
+export { ObjectId }
+export { Promise_2 as Promise }
+export { Timestamp }
+/* Excluded from this release type: WriteProtocolMessageType */
+export {}
+export { Code }
 
 /** @public */
 export declare type BitwiseFilter =
   | number /** numeric bit mask */
   | Binary /** BinData bit mask */
   | ReadonlyArray<number>
-
-export { BSONRegExp }
 
 /**
  * BSON Serialization options.
@@ -777,8 +794,6 @@ export declare interface BSONSerializeOptions
   /** Enable utf8 validation when deserializing BSON documents.  Defaults to true. */
   enableUtf8Validation?: boolean
 }
-
-export { BSONSymbol }
 
 /** @public */
 export declare const BSONType: Readonly<{
@@ -1335,8 +1350,6 @@ export declare interface ClusterTime {
     keyId: Long
   }
 }
-
-export { Code }
 
 /** @public */
 export declare interface CollationOptions {
@@ -2564,6 +2577,8 @@ export declare interface ConnectionPoolOptions
   maxPoolSize: number
   /** The minimum number of connections that MUST exist at any moment in a single connection pool. */
   minPoolSize: number
+  /** The maximum amount of time a connection should remain idle in the connection pool before being marked idle. */
+  maxIdleTimeMS: number
   /** The maximum amount of time operation execution should wait for a connection to become available. The default is 0 which means there is no limit. */
   waitQueueTimeoutMS: number
   /** If we are in load balancer mode. */
@@ -2571,6 +2586,7 @@ export declare interface ConnectionPoolOptions
 }
 
 /**
+ * An event published when a connection is ready for use
  * @public
  * @category Event
  */
@@ -2641,7 +2657,9 @@ export declare interface CreateCollectionOptions
   /** The number of seconds after which a document in a timeseries collection expires. */
   expireAfterSeconds?: number
 }
+
 /** @public */
+export declare interface CreateIndexesOptions extends CommandOperationOptions {
   /** Creates the index in the background, yielding whenever possible. */
   background?: boolean
   /** Creates an unique index. */
@@ -3092,16 +3110,11 @@ export declare interface DbOptions
   retryWrites?: boolean
 }
 
-/* Excluded from this release type: DbPrivate */
-export { DBRef }
-
 /** @public */
 export declare interface DbStatsOptions extends CommandOperationOptions {
   /** Divide the returned sizes by scale value. */
   scale?: number
 }
-
-export { Decimal128 }
 
 /** @public */
 export declare interface DeleteManyModel<TSchema extends Document = Document> {
@@ -3173,10 +3186,6 @@ export declare interface DestroyOptions {
 
 /** @public */
 export declare type DistinctOptions = CommandOperationOptions
-
-export { Document }
-
-export { Double }
 
 /** @public */
 export declare interface DriverInfo {
@@ -3279,10 +3288,10 @@ export declare type ExplainVerbosity = string
 export declare type ExplainVerbosityLike = ExplainVerbosity | boolean
 
 /** A MongoDB filter can be some portion of the schema or a set of operators @public */
-export declare type Filter<TSchema> =
+export declare type Filter<TSchema extends Document> =
   | Partial<TSchema>
   | ({
-      [Property in Join<NestedPaths<WithId<TSchema>>, '.'>]?: Condition<
+      [Property in DotPaths<TSchema>]?: Condition<
         PropertyType<WithId<TSchema>, Property>
       >
     } & RootFilterOperators<WithId<TSchema>>)
@@ -3344,7 +3353,7 @@ export declare type FinalizeFunction<TKey = ObjectId, TValue = Document> = (
 
 /** @public */
 export declare class FindCursor<
-  TSchema = Document
+  TSchema extends Document = Document
 > extends AbstractCursor<TSchema> {
   /* Excluded from this release type: [kFilter] */
   /* Excluded from this release type: [kNumReturned] */
@@ -3441,6 +3450,7 @@ export declare class FindCursor<
    * // Best way
    * const docs: FindCursor<{ a: number }> = cursor.project<{ a: number }>({ _id: 0, a: true });
    * // Flexible way
+   * const docs: FindCursor<Document> = cursor.project({ _id: 0, a: true });
    * ```
    *
    * @remarks
@@ -3464,14 +3474,14 @@ export declare class FindCursor<
    * }});
    * ```
    */
-  project<T extends Document = Document>(value: Document): FindCursor<T>
+  project<T extends TSchema>(value: Projection<T>): FindCursor<T>
   /**
    * Sets the sort order of the cursor query.
    *
    * @param sort - The key or keys set for the sort.
    * @param direction - The direction of the sorting (1 or -1).
    */
-  sort(sort: Sort | string, direction?: SortDirection): this
+  sort(sort: Sort<TSchema>, direction?: SortDirection): this
   /**
    * Allows disk use for blocking sort operations exceeding 100MB memory. (MongoDB 3.2 or higher)
    *
@@ -3500,31 +3510,29 @@ export declare class FindCursor<
 }
 
 /** @public */
-export declare interface FindOneAndDeleteOptions
-  extends CommandOperationOptions {
+export declare interface FindOneAndDeleteOptions<
+  TSchema extends Document = Document
+> extends CommandOperationOptions {
   /** An optional hint for query optimization. See the {@link https://docs.mongodb.com/manual/reference/command/update/#update-command-hint|update command} reference for more information.*/
   hint?: Document
-  /** Limits the fields to return for all matching documents. */
-  projection?: Document
   /** Determines which document the operation modifies if the query selects multiple documents. */
-  sort?: Sort
+  sort?: Sort<TSchema>
   /** Map of parameter names and values that can be accessed using $$var (requires MongoDB 5.0). */
   let?: Document
 }
 
 /** @public */
-export declare interface FindOneAndReplaceOptions
-  extends CommandOperationOptions {
+export declare interface FindOneAndReplaceOptions<
+  TSchema extends Document = Document
+> extends CommandOperationOptions {
   /** Allow driver to bypass schema validation in MongoDB 3.2 or higher. */
   bypassDocumentValidation?: boolean
   /** An optional hint for query optimization. See the {@link https://docs.mongodb.com/manual/reference/command/update/#update-command-hint|update command} reference for more information.*/
   hint?: Document
-  /** Limits the fields to return for all matching documents. */
-  projection?: Document
   /** When set to 'after', returns the updated document rather than the original. The default is 'before'.  */
   returnDocument?: ReturnDocument
   /** Determines which document the operation modifies if the query selects multiple documents. */
-  sort?: Sort
+  sort?: Sort<TSchema>
   /** Upsert the document if it does not exist. */
   upsert?: boolean
   /** Map of parameter names and values that can be accessed using $$var (requires MongoDB 5.0). */
@@ -3532,20 +3540,19 @@ export declare interface FindOneAndReplaceOptions
 }
 
 /** @public */
-export declare interface FindOneAndUpdateOptions
-  extends CommandOperationOptions {
+export declare interface FindOneAndUpdateOptions<
+  TSchema extends Document = Document
+> extends CommandOperationOptions {
   /** Optional list of array filters referenced in filtered positional operators */
   arrayFilters?: Document[]
   /** Allow driver to bypass schema validation in MongoDB 3.2 or higher. */
   bypassDocumentValidation?: boolean
   /** An optional hint for query optimization. See the {@link https://docs.mongodb.com/manual/reference/command/update/#update-command-hint|update command} reference for more information.*/
   hint?: Document
-  /** Limits the fields to return for all matching documents. */
-  projection?: Document
   /** When set to 'after', returns the updated document rather than the original. The default is 'before'.  */
   returnDocument?: ReturnDocument
   /** Determines which document the operation modifies if the query selects multiple documents. */
-  sort?: Sort
+  sort?: Sort<TSchema>
   /** Upsert the document if it does not exist. */
   upsert?: boolean
   /** Map of parameter names and values that can be accessed using $$var (requires MongoDB 5.0). */
@@ -3588,9 +3595,7 @@ export declare interface FindOptions<TSchema extends Document = Document>
   /** Sets the limit of documents returned in the query. */
   limit?: number
   /** Set to sort the documents coming back from the query. Array of indexes, `[['a', 1]]` etc. */
-  sort?: Sort
-  /** The fields to return in the query. Object of fields to either include or exclude (one of, not both), `{'a':1, 'b': 1}` **or** `{'a': 0, 'b': 0}` */
-  projection?: Document
+  sort?: Sort<TSchema>
   /** Set to skip N documents ahead in your query (useful for pagination). */
   skip?: number
   /** Tell the query to use specific indexes in the query. Object of indexes to use, `{'_id':1}` */
@@ -3758,7 +3763,9 @@ export declare class GridFSBucketReadStream
    */
   static readonly ERROR: 'error'
   /**
+   * Fires when the stream loaded the file document corresponding to the provided id.
    * @event
+   */
   static readonly FILE: 'file'
   /**
    * Emitted when a chunk of data is available to be consumed.
@@ -3798,7 +3805,12 @@ export declare class GridFSBucketReadStream
    * and kills the underlying cursor. Will emit the 'end' event, and then
    * the 'close' event once the cursor is successfully killed.
    *
+   * @param callback - called when the cursor is successfully closed or an error occurred.
    */
+  abort(callback?: Callback<void>): void
+}
+
+/** @public */
 export declare interface GridFSBucketReadStreamOptions {
   sort?: Sort
   skip?: number
@@ -4070,8 +4082,6 @@ export declare interface InsertOneResult<TSchema = Document> {
   /** The identifier that was inserted. If the server generated the identifier, this value will be null as the driver does not have access to that data */
   insertedId: InferIdType<TSchema>
 }
-
-export { Int32 }
 
 /** @public */
 export declare type IntegerType = number | Int32 | Long
@@ -4427,10 +4437,6 @@ export declare interface LoggerOptions {
   loggerLevel?: LoggerLevel
 }
 
-export { Long }
-
-export { Map_2 as Map }
-
 /** @public */
 export declare type MapFunction<TSchema = Document> = (this: TSchema) => void
 
@@ -4475,13 +4481,6 @@ export declare interface MapReduceOptions<TKey = ObjectId, TValue = Document>
 /** @public */
 export declare type MatchKeysAndValues<TSchema> = Readonly<Partial<TSchema>> &
   Record<string, any>
-
-export { MaxKey }
-
-/* Excluded from this release type: MessageStream */
-
-/* Excluded from this release type: MessageStreamOptions */
-export { MinKey }
 
 /** @public */
 export declare interface ModifyResult<TSchema = Document> {
@@ -4659,6 +4658,7 @@ export declare class MongoClient extends TypedEventEmitter<MongoClientEvents> {
    * @see docs.mongodb.org/manual/reference/connection-string/
    */
   connect(): Promise<this>
+  connect(callback: Callback<this>): void
   /**
    * Close the db and its underlying connections
    *
@@ -4770,6 +4770,7 @@ export declare interface MongoClientOptions
   /** An integer that specifies the compression level if using zlib for network compression. */
   zlibCompressionLevel?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | undefined
   /** The maximum number of hosts to connect to when using an srv connection string, a setting of `0` means unlimited hosts */
+  srvMaxHosts?: number
   /**
    * Modifies the srv URI to look like:
    *
@@ -5389,6 +5390,8 @@ export declare interface MonitorOptions
 
 /* Excluded from this release type: Msg */
 
+export declare type DotPaths<Type> = Join<NestedPaths<WithId<Type>>, '.'>
+
 /**
  * @public
  * returns tuple of strings (keys to be joined on '.') that represent every path into a schema
@@ -5410,6 +5413,7 @@ export declare type NestedPaths<Type> = Type extends
   : Type extends ReadonlyArray<infer ArrayType>
   ? [number, ...NestedPaths<ArrayType>]
   : Type extends Map<string, any>
+  ? [string]
   : Type extends object
   ? {
       [Key in Extract<keyof Type, string>]: Type[Key] extends Type
@@ -5447,8 +5451,6 @@ export declare type NumericType = IntegerType | Decimal128 | Double
  * @deprecated Please use `ObjectId`
  */
 export declare const ObjectID: typeof ObjectId
-
-export { ObjectId }
 
 /** @public */
 export declare type OneOrMore<T> = T | ReadonlyArray<T>
@@ -5551,18 +5553,26 @@ export declare type ProfilingLevel =
 /** @public */
 export declare type ProfilingLevelOptions = CommandOperationOptions
 
-/**
- * @public
- * Projection is flexible to permit the wide array of aggregation operators
- * @deprecated since v4.1.0: Since projections support all aggregation operations we have no plans to narrow this type further
- */
-export declare type Projection<TSchema extends Document = Document> = Document
+/** @public */
+export interface ProjectionOperators extends Document {
+  $elemMatch?: Document
+  $slice?: number | [number, number]
+  $meta?: string
+  /** @deprecated Since MongoDB 3.2, Use FindCursor#max */
+  $max?: any
+}
 
 /**
  * @public
- * @deprecated since v4.1.0: Since projections support all aggregation operations we have no plans to narrow this type further
+ * Projection is flexible to permit the wide array of aggregation operators
  */
-export declare type ProjectionOperators = Document
+export type Projection<TSchema> = {
+  [Key in keyof TSchema | DotPaths<TSchema>]?:
+    | ProjectionOperators
+    | 0
+    | 1
+    | boolean
+}
 
 /**
  * Global promise store allowing user-provided promises
@@ -5576,7 +5586,6 @@ declare class Promise_2 {
   /** Get the stored promise library, or resolves passed in */
   static get(): PromiseConstructor
 }
-export { Promise_2 as Promise }
 
 /** @public */
 export declare type PropertyType<
@@ -5899,7 +5908,7 @@ export declare interface RoleSpecification {
 }
 
 /** @public */
-export declare interface RootFilterOperators<TSchema> extends Document {
+export declare interface RootFilterOperators<TSchema extends Document> {
   $and?: Filter<TSchema>[]
   $nor?: Filter<TSchema>[]
   $or?: Filter<TSchema>[]
@@ -6030,7 +6039,9 @@ export declare class ServerDescription {
    * in the {@link https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst#serverdescription|SDAM spec}
    */
   equals(other: ServerDescription): boolean
+}
 
+/**
  * Emitted when server description changes, but does NOT include changes to the RTT.
  * @public
  * @category Event
@@ -6194,22 +6205,22 @@ export declare type SetFields<TSchema> = ({
 /** @public */
 export declare type SetProfilingLevelOptions = CommandOperationOptions
 
+export declare type SortMeta = {
+  $meta: 'textScore' | 'indexKey'
+}
+
 /** @public */
-export declare type Sort =
-  | string
-  | Exclude<
-      SortDirection,
-      {
-        $meta: string
-      }
-    >
-  | string[]
+export declare type Sort<TSchema extends Document = Document> =
+  | keyof Partial<TSchema>
+  | DotPaths<TSchema>
+  | Exclude<SortDirection, SortMeta>
+  | (keyof Partial<TSchema> | DotPaths<TSchema>)[]
   | {
-      [key: string]: SortDirection
+      [key in keyof TSchema | DotPaths<TSchema>]?: SortDirection
     }
-  | Map<string, SortDirection>
-  | [string, SortDirection][]
-  | [string, SortDirection]
+  | Map<keyof TSchema | DotPaths<TSchema>, SortDirection>
+  | [keyof TSchema | DotPaths<TSchema>, SortDirection][]
+  | [keyof TSchema | DotPaths<TSchema>, SortDirection]
 
 /** @public */
 export declare type SortDirection =
@@ -6219,9 +6230,7 @@ export declare type SortDirection =
   | 'desc'
   | 'ascending'
   | 'descending'
-  | {
-      $meta: string
-    }
+  | SortMeta
 
 /* Excluded from this release type: SortDirectionForCmd */
 
@@ -6304,8 +6313,6 @@ export declare interface TimeSeriesCollectionOptions extends Document {
   metaField?: string
   granularity?: 'seconds' | 'minutes' | 'hours' | string
 }
-
-export { Timestamp }
 
 /* Excluded from this release type: Topology */
 
@@ -7021,7 +7028,3 @@ export declare class WriteError {
   }
   toString(): string
 }
-
-/* Excluded from this release type: WriteProtocolMessageType */
-
-export {}
