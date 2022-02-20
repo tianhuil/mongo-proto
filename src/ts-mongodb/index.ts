@@ -1,6 +1,10 @@
-import { CollectionOptions, Db } from 'mongodb'
-import { TsCollection } from './collection'
-export * from './collection'
+import { Collection as OrigCollection, CollectionOptions, Db } from 'mongodb'
+import { Collection } from './type'
+export * from './type'
+
+interface WithUnsafeCollection<T> extends Collection<T> {
+  unsafe: OrigCollection<T>
+}
 
 export const mkTsCollection = <TSchema extends Document = Document>(
   db: Db,
@@ -9,10 +13,10 @@ export const mkTsCollection = <TSchema extends Document = Document>(
 ) =>
   new Proxy(db.collection<TSchema>(name, options), {
     get(target, property: string) {
-      if (property === 'dangerous') {
+      if (property === 'unsafe') {
         return target
       } else {
         return target[property as keyof typeof target]
       }
     },
-  }) as unknown as TsCollection<TSchema>
+  }) as unknown as WithUnsafeCollection<TSchema>
