@@ -1,4 +1,9 @@
-import { Collection as OrigCollection, CollectionOptions, Db } from 'mongodb'
+import {
+  Collection as OrigCollection,
+  CollectionOptions,
+  Db,
+  Document,
+} from 'mongodb'
 import { Collection } from './type'
 export * from './type'
 
