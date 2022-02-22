@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/tianhuil/mongo-proto#readme",
   "dependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.7",
     "@google-cloud/firestore": "^5.0.2",
     "@tsed/mongoose": "^6.102.1",
     "dotenv": "^10.0.0",
