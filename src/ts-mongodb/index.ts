@@ -7,7 +7,7 @@ import {
 import { Collection } from './type'
 export * from './type'
 
-interface WithUnsafeCollection<T> extends Collection<T> {
+export interface TsCollection<T> extends Collection<T> {
   unsafe: OrigCollection<T>
 }
 
@@ -24,4 +24,4 @@ export const mkTsCollection = <TSchema extends Document = Document>(
         return target[property as keyof typeof target]
       }
     },
-  }) as unknown as WithUnsafeCollection<TSchema>
+  }) as unknown as TsCollection<TSchema>
