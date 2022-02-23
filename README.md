@@ -7,3 +7,8 @@ The original `collection` has very loose typing.  The philosophy of this package
 - The `Sort` parameters are similarly constrained
 
 There is an escape hatch to use the original broadly-typed object via the pejoratively-named `unsafe` property.
+
+
+## Results
+- timePost can do 50-60 qps before performance starts deteriorating
+- timePostAgg can do between 90-100 qps

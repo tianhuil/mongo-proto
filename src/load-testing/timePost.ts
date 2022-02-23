@@ -1,5 +1,4 @@
-import { WithId } from 'mongodb'
-import { choose, mkDb, User } from './common'
+import { choose, fetchAuthorIds, mkDb, User } from './common'
 import { loadTest } from './loadTest'
 
 const maxPostsPerAuthor = 5
@@ -9,16 +8,12 @@ const main = async () => {
 
   await db.withDb(async ({ post, user }) => {
     // Setup
-    const userResults = await user
-      .find({})
-      .project<Pick<WithId<User>, '_id'>>({ _id: 1 })
-
-    const authorIds = await userResults.map((x) => x._id).toArray()
+    const authorIds = await fetchAuthorIds(user)
 
     // Testing
     await loadTest({
       filename: __dirname + `/data/timePost.${new Date().getTime()}.json`,
-      name: 'loadPost',
+      name: 'timePost',
       qps: 50,
       durationMs: 10000,
       fn: async () => {

@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from 'mongodb'
+import { MongoClient, ObjectId, WithId } from 'mongodb'
 import { mkTsCollection, TsCollection } from '../ts-mongodb'
 
 export interface Post {
@@ -60,3 +60,13 @@ export const mkDb = () => {
 export const randomInt = (max: number): number =>
   Math.floor(Math.random() * max)
 export const choose = <T>(array: T[]): T => array[randomInt(array.length)]
+
+export const fetchAuthorIds = async (
+  user: TsCollection<User>
+): Promise<ObjectId[]> => {
+  const userResults = await user
+    .find({})
+    .project<Pick<WithId<User>, '_id'>>({ _id: 1 })
+
+  return userResults.map((x) => x._id).toArray()
+}
