@@ -1,8 +1,6 @@
 import faker from '@faker-js/faker'
 import { ObjectId } from 'mongodb'
-import { CreditCard, mkDb, Post, User } from './common'
-
-const randomInt = (max: number) => Math.floor(Math.random() * max)
+import { CreditCard, mkDb, Post, randomInt, User } from './common'
 
 const maxCreditCards = 5
 const numUsers = 1000
@@ -37,7 +35,7 @@ const main = async () => {
       Array(numUsers).fill(null).map(newUser)
     )
     const authorIds = Object.values(usersResult.insertedIds)
-    console.log(`Successfully wrote ${authorIds.length} articles`)
+    console.info(`Successfully wrote ${authorIds.length} articles`)
 
     const postResult = await db.post.insertMany(
       authorIds.flatMap((authorId) =>
@@ -46,7 +44,7 @@ const main = async () => {
           .map(() => newPost(authorId))
       )
     )
-    console.log(`Successfully wrote ${postResult.insertedCount} articles`)
+    console.info(`Successfully wrote ${postResult.insertedCount} articles`)
   } finally {
     await db.close()
   }
