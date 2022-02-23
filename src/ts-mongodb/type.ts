@@ -507,7 +507,9 @@ export declare class AggregationCursor<
    * }});
    * ```
    */
-  project<T extends TSchema>($project: Projection<T>): AggregationCursor<T>
+  project<T extends Partial<TSchema>>(
+    $project: Projection<T>
+  ): AggregationCursor<T>
   /** Add a lookup stage to the aggregation pipeline */
   lookup($lookup: Document): this
   /** Add a redact stage to the aggregation pipeline */
@@ -3474,7 +3476,7 @@ export declare class FindCursor<
    * }});
    * ```
    */
-  project<T extends TSchema>(value: Projection<T>): FindCursor<T>
+  project<T extends Partial<TSchema>>(value: Projection<T>): FindCursor<T>
   /**
    * Sets the sort order of the cursor query.
    *
