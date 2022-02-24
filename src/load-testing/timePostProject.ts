@@ -13,8 +13,9 @@ const main = async () => {
 
     // Testing
     await loadTest({
-      filename: __dirname + `/data/timePostMin.${new Date().getTime()}.json`,
-      name: 'timePostMin',
+      filename:
+        __dirname + `/data/timePostProject.${new Date().getTime()}.json`,
+      name: 'timePostProject',
       qps: 60,
       durationMs: 10000,
       fn: async () => {
