@@ -508,7 +508,7 @@ export declare class AggregationCursor<
    * ```
    */
   project<T extends Partial<TSchema>>(
-    $project: Projection<T>
+    $project: Projection<T, TSchema>
   ): AggregationCursor<T>
   /** Add a lookup stage to the aggregation pipeline */
   lookup($lookup: Document): this
@@ -3476,7 +3476,9 @@ export declare class FindCursor<
    * }});
    * ```
    */
-  project<T extends Partial<TSchema>>(value: Projection<T>): FindCursor<T>
+  project<T extends Partial<TSchema>>(
+    value: Projection<T, TSchema>
+  ): FindCursor<T>
   /**
    * Sets the sort order of the cursor query.
    *
@@ -5568,13 +5570,18 @@ export interface ProjectionOperators extends Document {
  * @public
  * Projection is flexible to permit the wide array of aggregation operators
  */
-export type Projection<TSchema> = {
-  [Key in keyof TSchema | DotPaths<TSchema>]?:
-    | ProjectionOperators
-    | 0
-    | 1
-    | boolean
-}
+export type Projection<TSchema extends Partial<TSchemaFull>, TSchemaFull> =
+  | ({
+      [Key in keyof TSchema | DotPaths<TSchema>]?:
+        | ProjectionOperators
+        | 1
+        | true
+    } & { _id?: 1 | 0 | boolean })
+  | {
+      [Key in Exclude<keyof TSchemaFull, keyof TSchema> | DotPaths<TSchema>]?:
+        | 0
+        | false
+    }
 
 /**
  * Global promise store allowing user-provided promises
