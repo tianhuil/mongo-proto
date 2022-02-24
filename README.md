@@ -13,3 +13,6 @@ There is an escape hatch to use the original broadly-typed object via the pejora
 - timePost can do 50-60 qps before performance starts deteriorating
 - timePostAggProject (doesn't return the text fields) is also between 50-60 qps -- removing a large amount of data does not seem to improve throughput
 - timePostAgg can do between 90-100 qps
+
+## Results 2
+- timePost can do 100 qps if it's only a single query.
