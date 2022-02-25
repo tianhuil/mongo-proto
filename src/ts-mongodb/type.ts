@@ -5571,12 +5571,11 @@ export interface ProjectionOperators extends Document {
  * Projection is flexible to permit the wide array of aggregation operators
  */
 export type Projection<TSchema extends Partial<TSchemaFull>, TSchemaFull> =
-  | ({
-      [Key in keyof TSchema | DotPaths<TSchema>]?:
-        | ProjectionOperators
-        | 1
-        | true
-    } & { _id?: 1 | 0 | boolean })
+  | {
+      [Key in keyof TSchema | DotPaths<TSchema>]?: Key extends '_id'
+        ? 1 | 0 | boolean
+        : ProjectionOperators | 1 | true
+    }
   | {
       [Key in Exclude<keyof TSchemaFull, keyof TSchema> | DotPaths<TSchema>]?:
         | 0
