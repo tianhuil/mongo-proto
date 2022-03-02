@@ -3,7 +3,7 @@ import { createSchema, Type, typedModel } from 'ts-mongoose'
 
 const AddressSchema = createSchema({
   street: Type.string({ required: true }),
-  city: Type.string({ required: true, slkdjf: false }),
+  city: Type.string({ required: true }),
   state: Type.string({ required: true, abcd: false }),
 })
 
