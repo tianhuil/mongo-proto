@@ -1,6 +1,6 @@
 import { WithId } from 'mongodb'
-import { choose, fetchAuthorIds, mkDb, Post, User } from './common'
-import { loadTest } from './loadTest'
+import { choose, fetchAuthorIds, mkDb, Post, User } from '../common'
+import { loadTest } from '../timing'
 
 const maxPostsPerAuthor = 5
 
