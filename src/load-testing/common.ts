@@ -1,5 +1,5 @@
 import { MongoClient, ObjectId, WithId } from 'mongodb'
-import { mkTsCollection, TsCollection } from './ts-mongodb'
+import { mkTsCollection, TsCollection } from '../ts-mongodb'
 
 export interface Post {
   authorId: ObjectId
