@@ -16,7 +16,7 @@ import {
   MaxKey,
   MinKey,
   ObjectId,
-  Timestamp,
+  Timestamp
 } from 'bson'
 import type { SrvRecord } from 'dns'
 import { EventEmitter } from 'events'
@@ -25,7 +25,7 @@ import { Readable, Writable } from 'stream'
 import type {
   ConnectionOptions as ConnectionOptions_2,
   TLSSocket,
-  TLSSocketOptions,
+  TLSSocketOptions
 } from 'tls'
 
 /** @public */
@@ -767,7 +767,7 @@ export { ObjectId }
 export { Promise_2 as Promise }
 export { Timestamp }
 /* Excluded from this release type: WriteProtocolMessageType */
-export {}
+export { }
 export { Code }
 
 /** @public */
@@ -1768,14 +1768,17 @@ export declare class Collection<TSchema extends Document = Document> {
    * await collection.createIndex(['j', ['k', -1], { l: '2d' }])
    * ```
    */
-  createIndex(indexSpec: IndexSpecification): Promise<string>
-  createIndex(indexSpec: IndexSpecification, callback: Callback<string>): void
+  createIndex(indexSpec: IndexSpecification<TSchema>): Promise<string>
   createIndex(
-    indexSpec: IndexSpecification,
+    indexSpec: IndexSpecification<TSchema>,
+    callback: Callback<string>
+  ): void
+  createIndex(
+    indexSpec: IndexSpecification<TSchema>,
     options: CreateIndexesOptions
   ): Promise<string>
   createIndex(
-    indexSpec: IndexSpecification,
+    indexSpec: IndexSpecification<TSchema>,
     options: CreateIndexesOptions,
     callback: Callback<string>
   ): void
@@ -2952,20 +2955,23 @@ export declare class Db {
    * @param options - Optional settings for the command
    * @param callback - An optional callback, a Promise will be returned if none is provided
    */
-  createIndex(name: string, indexSpec: IndexSpecification): Promise<string>
-  createIndex(
+  createIndex<TSchema extends Document>(
     name: string,
-    indexSpec: IndexSpecification,
+    indexSpec: IndexSpecification<TSchema>
+  ): Promise<string>
+  createIndex<TSchema extends Document>(
+    name: string,
+    indexSpec: IndexSpecification<TSchema>,
     callback?: Callback<string>
   ): void
-  createIndex(
+  createIndex<TSchema extends Document>(
     name: string,
-    indexSpec: IndexSpecification,
+    indexSpec: IndexSpecification<TSchema>,
     options: CreateIndexesOptions
   ): Promise<string>
-  createIndex(
+  createIndex<TSchema extends Document>(
     name: string,
-    indexSpec: IndexSpecification,
+    indexSpec: IndexSpecification<TSchema>,
     options: CreateIndexesOptions,
     callback: Callback<string>
   ): void
@@ -4026,17 +4032,16 @@ export declare interface IndexInformationOptions {
 }
 
 /** @public */
-export declare type IndexSpecification = OneOrMore<
-  | string
-  | [string, IndexDirection]
+export declare type IndexSpecification<TSchema extends Document> =
+  | keyof TSchema
+  | [keyof TSchema, IndexDirection]
   | {
-      [key: string]: IndexDirection
+      [key in keyof TSchema]?: IndexDirection
     }
-  | [string, IndexDirection][]
+  | [keyof TSchema, IndexDirection][]
   | {
-      [key: string]: IndexDirection
+      [key in keyof TSchema]?: IndexDirection
     }[]
->
 
 /** Given an object shaped type, return the type of the _id field or default to ObjectId @public */
 export declare type InferIdType<TSchema> = TSchema extends {

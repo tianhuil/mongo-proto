@@ -19,6 +19,20 @@ export const mkDbFactory = <T>(mkTsCollections: (db: Db) => T) => {
   }
 }
 
-export const randomInt = (max: number): number =>
-  Math.floor(Math.random() * max)
+export function randomInt(max: number): number
+export function randomInt(min: number, max: number): number
+export function randomInt(...args: number[]): number {
+  const parseArgs = (): [number, number] => {
+    switch (args.length) {
+      case 1:
+        return [0, args[0]]
+      case 2:
+        return [args[0], args[1]]
+      default:
+        throw Error(`Expected either 1 or two arguments, got ${args.length}`)
+    }
+  }
+  const [min, max] = parseArgs()
+  return min + Math.floor(Math.random() * (max - min))
+}
 export const choose = <T>(array: T[]): T => array[randomInt(array.length)]

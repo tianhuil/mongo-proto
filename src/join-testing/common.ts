@@ -1,6 +1,6 @@
-import { Db, ObjectId } from 'mongodb'
+import { Db, Document, ObjectId } from 'mongodb'
 import { mkDbFactory } from '../common'
-import { mkTsCollection } from '../ts-mongodb'
+import { mkTsCollection, TsCollection } from '../ts-mongodb'
 
 // Exploring performance of one-to-few, one-to-many, and one-to-squillions joins
 // https://www.mongodb.com/developer/article/mongodb-schema-design-best-practices/
@@ -40,12 +40,20 @@ export interface PostC extends PostBase {
 export interface UserC extends UserBase {}
 
 const mkTsCollections = (db: Db) => ({
-  postA: mkTsCollection<PostA>(db, 'join-testing-user-A'),
+  postA: mkTsCollection<PostA>(db, 'join-testing-post-A'),
   userA: mkTsCollection<UserA>(db, 'join-testing-user-A'),
-  postB: mkTsCollection<PostB>(db, 'join-testing-user-B'),
+  postB: mkTsCollection<PostB>(db, 'join-testing-post-B'),
   userB: mkTsCollection<UserB>(db, 'join-testing-user-B'),
-  postC: mkTsCollection<PostC>(db, 'join-testing-user-C'),
+  postC: mkTsCollection<PostC>(db, 'join-testing-post-C'),
   userC: mkTsCollection<UserC>(db, 'join-testing-user-C'),
 })
 
 export const mkDb = () => mkDbFactory(mkTsCollections)
+
+export const fetchIds = async <T extends Document>(
+  user: TsCollection<T>
+): Promise<ObjectId[]> => {
+  const userResults = await user.find({}).project({ _id: 1 })
+
+  return userResults.map((x) => x._id as ObjectId).toArray()
+}
