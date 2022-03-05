@@ -62,6 +62,34 @@ const main = async () => {
       },
     })
     console.log('Tested C')
+
+    await loadTest({
+      filename: __dirname + `/data/time.${new Date().getTime()}.C2.json`,
+      name: 'timeC2',
+      qps,
+      durationMs,
+      fn: async () => {
+        const userId = choose(userCIds)
+
+        const user = await userC
+          .aggregate([
+            { $match: { _id: userId } },
+            {
+              $lookup: {
+                from: postC.collectionName,
+                localField: '_id',
+                foreignField: 'userId',
+                as: 'posts',
+              },
+            },
+          ])
+          .limit(1)
+          .toArray()
+
+        return [user[0]._id, user[0].posts.length]
+      },
+    })
+    console.log('Tested C2')
   })
 }
 

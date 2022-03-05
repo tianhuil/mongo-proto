@@ -22,3 +22,24 @@ There is an escape hatch to use the original broadly-typed object via the pejora
 ## Result 3
 - With no congestion, a small query has an overhead of 25ms.
 - 1MB takes approximately 250ms to transfer.
+
+## Result 4
+With a joined collection we have several ways to connect them.  Assume we have a user who has multiple posts:
+1. Embed the post directly in the user.  Queries for user and their posts return in 33ms (assuming a small amount of data)
+2. A list of post object ids in the user object.  Queries are necessarily sequential (first query user, then the corresponding object) and take 56ms in total.
+3. The user id on the post object.  Even with an index on the user id on post and parralelizing the user and post query, the results take 54ms in total.  However, the standard deviation of times is lower.
+4. Use the `$lookup` and `aggregate` to query the data layout in #3 as a single query.  This is now back to 29ms.
+
+╔════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╗
+║            │ name              │ timeMs_mean       │ timeMs_std        │ length_mean       │ length_count      ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 0          │ timeA             │ 32.75             │ 5.4374432846406…  │ 5.1009489985609…  │ 20                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 1          │ timeB             │ 56.4              │ 4.9032749528409…  │ 6.3081080781011…  │ 20                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 2          │ timeC             │ 54.55             │ 2.0894471693929…  │ 5.5508060575758…  │ 20                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 3          │ timeC2            │ 29.45             │ 2.8923674513595…  │ 5.2955085762355…  │ 20                ║
+╚════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╝
+
+The results indicate suggests that #3 is being run sequentially on the server because mongo is single-threading the queries.  [This post](https://www.mongodb.com/community/forums/t/will-mongodb-utilize-all-my-4-cpus/3721/4?u=tianhui_li) confirms that mongo will single-thread the requests from a given connection.
