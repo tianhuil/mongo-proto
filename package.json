@@ -23,16 +23,22 @@
     "@faker-js/faker": "^6.0.0-alpha.7",
     "@google-cloud/firestore": "^5.0.2",
     "@tsed/mongoose": "^6.102.1",
+    "danfojs-node": "^1.0.2",
     "dotenv": "^10.0.0",
+    "glob": "^7.2.0",
+    "glob-promise": "^4.2.2",
     "mongodb": "4.3.1",
     "ts-mongoose": "^0.0.24"
   },
   "devDependencies": {
+    "@types/node": "^17.0.21",
     "@typescript-eslint/parser": "^5.8.1",
+    "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-prettier": "^4.0.0",
     "mongoose": "^6.1.4",
+    "prettier": "^2.5.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   }
