@@ -1,17 +1,6 @@
 import * as dfd from 'danfojs-node'
 import glob from 'glob-promise'
 
-interface TimingRaw {
-  name: string
-  qps: number
-  timeMs: number
-}
-
-interface Timing extends TimingRaw {
-  type: string
-  size: number
-}
-
 const main = async () => {
   const files = await glob(__dirname + `/data/*.json`)
   const results = await Promise.all(
