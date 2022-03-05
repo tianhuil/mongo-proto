@@ -1,4 +1,5 @@
-import { Db, MongoClient } from 'mongodb'
+import { Db, Document, MongoClient, ObjectId } from 'mongodb'
+import { TsCollection } from './ts-mongodb'
 
 export const mkDbFactory = <T>(mkTsCollections: (db: Db) => T) => {
   const uri = process.env.MONGO_URL || ''
@@ -36,3 +37,11 @@ export function randomInt(...args: number[]): number {
   return min + Math.floor(Math.random() * (max - min))
 }
 export const choose = <T>(array: T[]): T => array[randomInt(array.length)]
+
+export const fetchIds = async <T extends Document>(
+  coll: TsCollection<T>
+): Promise<ObjectId[]> => {
+  const results = await coll.find({}).project({ _id: 1 })
+
+  return results.map((x) => x._id as ObjectId).toArray()
+}

@@ -6,6 +6,7 @@ interface LoadTestParam<T> {
   qps: number
   durationMs: number
   fn: () => Promise<T>
+  newlineDelimited?: boolean // default is false
 }
 
 interface TimedRun<T> {
@@ -41,6 +42,7 @@ export const loadTest = async <T>({
   qps,
   durationMs,
   fn,
+  newlineDelimited,
 }: LoadTestParam<T>): Promise<void> => {
   const timeFn = async (i: number): Promise<TimedRun<T>> => {
     const startTime = new Date().getTime()
@@ -58,8 +60,12 @@ export const loadTest = async <T>({
   const delayMs = 1000 / qps
   const repetitions = (qps * durationMs) / 1000
   const results = await setNIntervals(timeFn, delayMs, repetitions)
-  await fs.promises.writeFile(
-    filename,
-    results.map((x) => JSON.stringify(x)).join('\n')
-  )
+  if (newlineDelimited ?? false) {
+    await fs.promises.writeFile(
+      filename,
+      results.map((x) => JSON.stringify(x)).join('\n')
+    )
+  } else {
+    fs.promises.writeFile(filename, JSON.stringify(results, null, '\t'))
+  }
 }

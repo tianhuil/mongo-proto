@@ -1,6 +1,6 @@
-import { Db, Document, ObjectId } from 'mongodb'
+import { Db, ObjectId } from 'mongodb'
 import { mkDbFactory } from '../common'
-import { mkTsCollection, TsCollection } from '../ts-mongodb'
+import { mkTsCollection } from '../ts-mongodb'
 
 // Exploring performance of one-to-few, one-to-many, and one-to-squillions joins
 // https://www.mongodb.com/developer/article/mongodb-schema-design-best-practices/
@@ -49,11 +49,3 @@ const mkTsCollections = (db: Db) => ({
 })
 
 export const mkDb = () => mkDbFactory(mkTsCollections)
-
-export const fetchIds = async <T extends Document>(
-  user: TsCollection<T>
-): Promise<ObjectId[]> => {
-  const userResults = await user.find({}).project({ _id: 1 })
-
-  return userResults.map((x) => x._id as ObjectId).toArray()
-}

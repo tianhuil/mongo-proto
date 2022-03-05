@@ -18,3 +18,7 @@ There is an escape hatch to use the original broadly-typed object via the pejora
 
 ## Results 2
 - timePost can do 100 qps if it's only a single query.
+
+## Result 3
+- With no congestion, a small query has an overhead of 25ms.
+- 1MB takes approximately 250ms to transfer.

@@ -1,27 +1,40 @@
 import faker from '@faker-js/faker'
-import { BlobStr, mkDb, sizes } from './common'
+import { BlobStr, BlobStrArr, mkDb, sizes } from './common'
 
 const numBlob = 100
 
-const newBlob = (size: number): BlobStr => ({
+const newBlobStr = (size: number): BlobStr => ({
   size,
   text: faker.lorem.paragraphs(size),
 })
 
+const newBlobStrArr = (size: number): BlobStrArr => ({
+  size,
+  texts: faker.lorem.paragraphs(size, '\n').split('\n'),
+})
+
 const main = async () => {
   const db = mkDb()
-  await db.withDb(async ({ blobStr }) => {
+  await db.withDb(async ({ blobStr, blobStrArr }) => {
     await blobStr.deleteMany({})
-
     await blobStr.insertMany(
       sizes.flatMap((size) =>
         Array(numBlob)
           .fill(null)
-          .map(() => newBlob(size))
+          .map(() => newBlobStr(size))
       )
     )
-
     await blobStr.createIndex({ size: 1 })
+
+    await blobStrArr.deleteMany({})
+    await blobStrArr.insertMany(
+      sizes.flatMap((size) =>
+        Array(numBlob)
+          .fill(null)
+          .map(() => newBlobStrArr(size))
+      )
+    )
+    await blobStrArr.createIndex({ size: 1 })
   })
 }
 
