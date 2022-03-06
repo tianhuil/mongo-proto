@@ -1,22 +1,9 @@
-import faker from '@faker-js/faker'
 import { randomInt } from '../common'
-import { mkDb, PostBase, UserBase } from './common'
+import { mkDb, newIdPost, newPost, newUser } from './common'
 
 const numUsers = 1000
 const maxPostsPerAuthor = 25
 const minPostsPerAuthor = 5
-
-const newUser = (): UserBase => ({
-  name: faker.name.findName(),
-  rating: randomInt(100),
-  contact: { email: faker.internet.email() },
-})
-
-const newPost = (): PostBase => ({
-  text: faker.lorem.sentence(),
-  title: faker.lorem.words(randomInt(100)),
-  date: faker.date.past(5),
-})
 
 const main = async () => {
   const db = mkDb()
@@ -32,7 +19,7 @@ const main = async () => {
           ...newUser(),
           posts: Array(randomInt(minPostsPerAuthor, maxPostsPerAuthor))
             .fill(null)
-            .map(newPost),
+            .map(newIdPost),
         }))
     )
     console.log('Wrote A')

@@ -1,5 +1,6 @@
+import faker from '@faker-js/faker'
 import { Db, ObjectId } from 'mongodb'
-import { mkDbFactory } from '../common'
+import { mkDbFactory, randomInt } from '../common'
 import { mkTsCollection } from '../ts-mongodb'
 
 // Exploring performance of one-to-few, one-to-many, and one-to-squillions joins
@@ -22,7 +23,9 @@ export interface UserBase {
 }
 
 // one-to-few
-export interface PostA extends PostBase {}
+export interface PostA extends PostBase {
+  _id: ObjectId
+}
 export interface UserA extends UserBase {
   posts: PostA[]
 }
@@ -49,3 +52,20 @@ const mkTsCollections = (db: Db) => ({
 })
 
 export const mkDb = () => mkDbFactory(mkTsCollections)
+
+export const newUser = (): UserBase => ({
+  name: faker.name.findName(),
+  rating: randomInt(100),
+  contact: { email: faker.internet.email() },
+})
+
+export const newPost = (): PostBase => ({
+  text: faker.lorem.sentence(),
+  title: faker.lorem.words(randomInt(100)),
+  date: faker.date.past(5),
+})
+
+export const newIdPost = (): PostBase & { _id: ObjectId } => ({
+  ...newPost(),
+  _id: new ObjectId(),
+})
