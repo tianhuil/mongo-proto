@@ -25,10 +25,10 @@ There is an escape hatch to use the original broadly-typed object via the pejora
 
 ## Result 4
 With a joined collection we have several ways to connect them.  Assume we have a user who has multiple posts:
-1. Embed the post directly in the user.  Queries for user and their posts return in 33ms (assuming a small amount of data)
-2. A list of post object ids in the user object.  Queries are necessarily sequential (first query user, then the corresponding object) and take 56ms in total.
-3. The user id on the post object.  Even with an index on the user id on post and parralelizing the user and post query, the results take 54ms in total.  However, the standard deviation of times is lower.
-4. Use the `$lookup` and `aggregate` to query the data layout in #3 as a single query.  This is now back to 29ms.
+- (A) Embed the post directly in the user.  Queries for user and their posts return in 33ms.
+- (B) A list of post object ids in the user object.  Queries are also necessarily sequential (first query user, then the corresponding object) and take 56ms in total.
+- (C) The user id on the post object.  Even with an index on the user id on post and parralelizing the user and post query, the results take 55ms in total.  However, the standard deviation is lower than in (B).
+- (C2) Use the `$lookup` and `aggregate` to query the data layout in (C)) as a single query.  This is now back to 29ms.
 
 ╔════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╗
 ║            │ name              │ timeMs_mean       │ timeMs_std        │ length_mean       │ length_count      ║
@@ -42,4 +42,45 @@ With a joined collection we have several ways to connect them.  Assume we have a
 ║ 3          │ timeC2            │ 29.45             │ 2.8923674513595…  │ 5.2955085762355…  │ 20                ║
 ╚════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╝
 
-The results indicate suggests that #3 is being run sequentially on the server because mongo is single-threading the queries.  [This post](https://www.mongodb.com/community/forums/t/will-mongodb-utilize-all-my-4-cpus/3721/4?u=tianhui_li) confirms that mongo will single-thread the requests from a given connection.
+The results indicate suggests that (B) is being run sequentially on the server because mongo is single-threading the queries.  [This post](https://www.mongodb.com/community/forums/t/will-mongodb-utilize-all-my-4-cpus/3721/4?u=tianhui_li) confirms that mongo will single-thread the requests from a given connection.
+
+## Result 5
+On average, the queries for A, B, and C take the same amount of time.  However, notice that the standard deviation for B is significantly longer, indicating that it is strictly suboptimal.
+
+╔════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╗
+║            │ name              │ timeMs_mean       │ timeMs_std        │ timeMs_count      ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 0          │ timeA             │ 17.775            │ 2.9077591528768…  │ 80                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 1          │ timeB             │ 18.6375           │ 11.539962211727…  │ 80                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 2          │ timeC             │ 16.2875           │ 2.0388241212690…  │ 80                ║
+╚════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╝
+
+## Result 6
+For adding a new post to an existing user, (A) and (C) are the fastest while (B) takes twice as long.  This is likely because the architecture necessitates two updates (on both the user and the post), not one.
+
+╔════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╗
+║            │ name              │ timeMs_mean       │ timeMs_std        │ timeMs_count      ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 0          │ timeA             │ 16.1              │ 1.9054577483558…  │ 40                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 1          │ timeB             │ 31.2              │ 3.1231148159883…  │ 40                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 2          │ timeC             │ 16.175            │ 1.59947908186801  │ 40                ║
+╚════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╝
+
+For editing a post on a user, the three have similar performance and all three require only an edit of a single record.
+
+╔════════════╤═══════════════════╤═══════════════════╤═══════════════════╤═══════════════════╗
+║            │ name              │ timeMs_mean       │ timeMs_std        │ timeMs_count      ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 0          │ timeA             │ 16.55             │ 2.0248456731316…  │ 40                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 1          │ timeB             │ 15.225            │ 2.1181450520534…  │ 40                ║
+╟────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────╢
+║ 2          │ timeC             │ 14.8              │ 1.3811923499977…  │ 40                ║
+╚════════════╧═══════════════════╧═══════════════════╧═══════════════════╧═══════════════════╝
+
+However, both of these updates, queries for (A) and (B) are subtle and type safety is poorly supported.  This is because they both require updating an embedded list record in the user, which is subtle.
+I have less confidence that I have done it correctly than with (C)

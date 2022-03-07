@@ -2,7 +2,7 @@ import * as dfd from 'danfojs-node'
 import glob from 'glob-promise'
 
 const main = async () => {
-  const files = await glob(__dirname + `/data/timeCreate.*.json`)
+  const files = await glob(__dirname + `/data/timeUpdateNewPost.*.json`)
   const results = await Promise.all(
     files.map((file) => dfd.readJSON(file) as Promise<dfd.DataFrame>)
   )
