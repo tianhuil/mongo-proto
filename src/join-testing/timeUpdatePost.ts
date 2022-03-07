@@ -1,6 +1,6 @@
 import { choose } from '../common'
 import { loadTest } from '../timing'
-import { mkDb, newIdPost, newPost } from './common'
+import { mkDb } from './common'
 
 const qps = 10
 const durationMs = 4000
@@ -12,20 +12,22 @@ const main = async () => {
     // Setup
     const userAs = await userA.find({}).toArray()
     const userBs = await userB.find({}).toArray()
-    const userCs = await userC.find({}).toArray()
+    const postCs = await postC.find({}).toArray()
 
     // Testing
     await loadTest({
       filename:
-        __dirname + `/data/timeUpdateNewPost.${new Date().getTime()}.A.json`,
+        __dirname + `/data/timeUpdatePost.${new Date().getTime()}.A.json`,
       name: 'timeA',
       qps,
       durationMs,
       fn: async () => {
         const user = choose(userAs)
-        const result = await userA.updateOne(
-          { _id: user._id },
-          { $push: { posts: newIdPost() } }
+        const postId = choose(user.posts)._id
+        // TODO: make this safe
+        const result = await userA.unsafe.updateOne(
+          { _id: user._id, posts: { $elemMatch: { _id: postId } } },
+          { $inc: { 'posts.$.rating': 1 } }
         )
         return result
       },
@@ -34,34 +36,34 @@ const main = async () => {
 
     await loadTest({
       filename:
-        __dirname + `/data/timeUpdateNewPost.${new Date().getTime()}.B.json`,
+        __dirname + `/data/timeUpdatePost.${new Date().getTime()}.B.json`,
       name: 'timeB',
       qps,
       durationMs,
       fn: async () => {
         const user = choose(userBs)
-        const newPost = newIdPost()
-        const results = await Promise.all([
-          await userB.updateOne(
-            { _id: user._id },
-            { $push: { postIds: newPost._id } }
-          ),
-          await postB.insertOne(newPost),
-        ])
-        return results
+        const postId = choose(user.postIds)
+        const result = await postB.updateOne(
+          { _id: postId },
+          { $inc: { rating: 1 } } // TODO: rating can be anything
+        )
+        return result
       },
     })
     console.log('Tested B')
 
     await loadTest({
       filename:
-        __dirname + `/data/timeUpdateNewPost.${new Date().getTime()}.C.json`,
+        __dirname + `/data/timeUpdatePost.${new Date().getTime()}.C.json`,
       name: 'timeC',
       qps,
       durationMs,
       fn: async () => {
-        const user = choose(userCs)
-        const result = await postC.insertOne({ ...newPost(), userId: user._id })
+        const post = choose(postCs)
+        const result = await postC.updateOne(
+          { _id: post._id },
+          { $inc: { rating: 1 } }
+        )
         return result
       },
     })
