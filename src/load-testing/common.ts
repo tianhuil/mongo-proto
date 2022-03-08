@@ -27,12 +27,10 @@ export interface User {
   creditCards: CreditCard[]
 }
 
-export const mkDb = () => {
-  return mkDbFactory((db) => ({
-    post: mkTsCollection<Post>(db, 'loading-test-post'),
-    user: mkTsCollection<User>(db, 'loading-test-user'),
-  }))
-}
+export const mkDb = mkDbFactory((db) => ({
+  post: mkTsCollection<Post>(db, 'loading-test-post'),
+  user: mkTsCollection<User>(db, 'loading-test-user'),
+}))
 
 export const fetchAuthorIds = async (
   user: TsCollection<User>

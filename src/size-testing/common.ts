@@ -17,7 +17,7 @@ const mkTsCollections = (db: Db) => ({
   blobStrArr: mkTsCollection<BlobStrArr>(db, 'size-testing-blob-str-arr'),
 })
 
-export const mkDb = () => mkDbFactory(mkTsCollections)
+export const mkDb = mkDbFactory(mkTsCollections)
 
 export const sizes = [10, 100, 1000, 10000]
 
