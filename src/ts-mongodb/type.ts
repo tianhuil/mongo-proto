@@ -3299,9 +3299,7 @@ export declare type ExplainVerbosityLike = ExplainVerbosity | boolean
 export declare type Filter<TSchema extends Document> =
   | Partial<TSchema>
   | ({
-      [Property in DotPaths<TSchema>]?: Condition<
-        PropertyType<WithId<TSchema>, Property>
-      >
+      [Property in DotPaths<TSchema>]?: PropertyType<WithId<TSchema>, Property>
     } & RootFilterOperators<WithId<TSchema>>)
 
 /** @public */
@@ -3312,8 +3310,14 @@ export declare type FilterOperations<T> = T extends Record<string, any>
   : FilterOperators<T>
 
 /** @public */
-export declare interface FilterOperators<TValue>
-  extends NonObjectIdLikeDocument {
+export declare interface FilterArrayOperators<TValue> {
+  $elemMatch?: Filter<TValue>
+  $all?: ReadonlyArray<Filter<TValue> | { $elemMatch: Filter<TValue> }>
+  $size?: TValue extends ReadonlyArray<any> ? number : never
+}
+
+/** @public */
+export declare interface FilterOperators<TValue> {
   $eq?: TValue
   $gt?: TValue
   $gte?: TValue
@@ -3343,9 +3347,6 @@ export declare interface FilterOperators<TValue>
   $near?: Document
   $nearSphere?: Document
   $maxDistance?: number
-  $all?: ReadonlyArray<any>
-  $elemMatch?: Document
-  $size?: TValue extends ReadonlyArray<any> ? number : never
   $bitsAllClear?: BitwiseFilter
   $bitsAllSet?: BitwiseFilter
   $bitsAnyClear?: BitwiseFilter
@@ -5404,6 +5405,7 @@ export declare type DotPaths<Type> = Join<NestedPaths<WithId<Type>>, '.'>
 /**
  * @public
  * returns tuple of strings (keys to be joined on '.') that represent every path into a schema
+ * including partial paths (i.e. paths that end in an array or object)
  * https://docs.mongodb.com/manual/tutorial/query-embedded-documents/
  */
 export declare type NestedPaths<Type> = Type extends
@@ -5434,18 +5436,18 @@ export declare type NestedPaths<Type> = Type extends
           ? [Key]
           : ArrayType extends Type
           ? [Key]
-          : [Key, ...NestedPaths<Type[Key]>]
-        : [Key, ...NestedPaths<Type[Key]>]
+          : [Key, ...NestedPaths<Type[Key]>] | [Key]
+        : [Key, ...NestedPaths<Type[Key]>] | [Key]
     }[Extract<keyof Type, string>]
   : []
 
 /**
  * @public
- * A type that extends Document but forbids anything that "looks like" an object id.
+ * A type that extends TValue but forbids anything that "looks like" an object id.
  */
-export declare type NonObjectIdLikeDocument = {
+export declare type NonObjectIdLikeDocument<TValue> = {
   [key in keyof ObjectIdLike]?: never
-} & Document
+} & TValue
 
 /** It avoids using fields with not acceptable types @public */
 export declare type NotAcceptedFields<TSchema, FieldType> = {
@@ -5607,7 +5609,9 @@ export declare type PropertyType<
 > = string extends Property
   ? unknown
   : Property extends keyof Type
-  ? Type[Property]
+  ? Type[Property] extends ReadonlyArray<infer ArrayType>
+    ? FilterArrayOperators<ArrayType>
+    : Type[Property]
   : Property extends `${number}`
   ? Type extends ReadonlyArray<infer ArrayType>
     ? ArrayType
@@ -5619,7 +5623,7 @@ export declare type PropertyType<
       : unknown
     : Key extends keyof Type
     ? Type[Key] extends Map<string, infer MapType>
-      ? MapType
+      ? Condition<MapType>
       : PropertyType<Type[Key], Rest>
     : unknown
   : unknown
