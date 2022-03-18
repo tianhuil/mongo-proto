@@ -9,6 +9,10 @@ beforeAll(async () => {
   await db.connect()
 })
 
+afterAll(async () => {
+  if (db) await db.close()
+})
+
 const singleSeedParams = {
   numUsers: 1,
   maxPostsPerAuthor: 1,
@@ -97,8 +101,4 @@ describe('test join testing', () => {
     expect(result).toBeTruthy()
     expect(result?.userId).toEqual(userId)
   })
-})
-
-afterAll(async () => {
-  if (db) await db.close()
 })
