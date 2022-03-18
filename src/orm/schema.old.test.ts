@@ -7,7 +7,7 @@ import {
   objectField,
   StringField,
   stringField,
-} from './schema'
+} from './schema.old'
 
 describe('ORM Test', () => {
   test('name is set on schema', () => {
