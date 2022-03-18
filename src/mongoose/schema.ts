@@ -7,10 +7,12 @@ export const AddressSchema = createSchema({
 })
 
 export const UserSchema = createSchema({
-  name: Type.string({ required: true, alias: 'name2' }),
+  name: Type.string({ required: true, alias: 'nameAlias' }),
   email: Type.string({ required: true }),
   avatar: Type.string(),
-  address: Type.schema({ required: true }).of(AddressSchema),
+  address: Type.schema({ required: true, alias: 'addressAlias' }).of(
+    AddressSchema
+  ),
 })
 
 // 3. Create a Model.

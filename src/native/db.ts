@@ -17,9 +17,8 @@ export interface User {
   }
 }
 
-export const mkDb = () => {
-  const uri = process.env.MONGO_URL || ''
-  const client = new MongoClient(uri)
+export const mkDb = (uri?: string) => {
+  const client = new MongoClient(uri ?? process.env.MONGO_URL ?? '')
   const dbName = 'test'
   const db = client.db(dbName)
   return {
