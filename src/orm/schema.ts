@@ -72,7 +72,7 @@ export class ArrayField extends CoreField implements IFieldType {
   toDb = (input: any) => input.map((x: any) => this.elem.toDb(x))
   fromDb = (input: any) => input.map((x: any) => this.elem.fromDb(x))
   setName = (name: string) => {
-    this.setName(name)
+    this.name = name
     this.elem.setName('') // no name for arrays
   }
 }
@@ -139,14 +139,14 @@ export class ObjectField extends CoreField implements IFieldType {
   }
 
   setName = (name: string) => {
-    this.setName(name)
+    this.name = name
     Object.entries(this.schema).forEach(([key, field]) => {
       field.setName(key)
     })
   }
 }
 
-type FieldType = PrimitiveField | ObjectField
+type FieldType = PrimitiveField | ArrayField | ObjectField
 
 type IPrimitiveFieldProps = Omit<ICoreField, 'name'>
 export const stringField = (fields: IPrimitiveFieldProps) =>
