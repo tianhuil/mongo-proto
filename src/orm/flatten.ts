@@ -23,7 +23,7 @@ export declare type NestedPaths<Type> = Type extends
     }
   ? []
   : Type extends ReadonlyArray<infer ArrayType>
-  ? [number, ...NestedPaths<ArrayType>]
+  ? [number, ...NestedPaths<ArrayType>] | [number]
   : Type extends Map<string, unknown>
   ? [string]
   : Type extends object
@@ -44,10 +44,7 @@ export declare type NestedPaths<Type> = Type extends
 
 export declare type FlattenPaths<Type> = Join<NestedPaths<WithId<Type>>, '.'>
 
-export declare type FlattenType<
-  Schema,
-  Property extends string
-> = string extends Property
+type _FlattenType<Schema, Property extends string> = string extends Property
   ? never
   : Property extends keyof Schema
   ? Schema extends NonArrayObject
@@ -63,8 +60,11 @@ export declare type FlattenType<
       ? FlattenType<ArrayType, Rest>
       : never
     : Key extends keyof Schema
-    ? Schema[Key] extends NonArrayObject
-      ? FlattenType<Schema[Key], Rest>
-      : never
+    ? FlattenType<Schema[Key], Rest>
     : never
   : never
+
+export declare type FlattenType<Schema, Property extends string> = _FlattenType<
+  WithId<Schema>,
+  Property
+>
