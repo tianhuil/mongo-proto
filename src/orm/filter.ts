@@ -1,8 +1,17 @@
-import { Document } from 'mongodb'
+import { Document, WithId } from 'mongodb'
 import { DotPaths } from '../ts-mongodb'
 
-type RecurPartial<T> = {
+export type RecurPartial<T> = {
   [P in keyof T]?: T[P] extends Record<string, any> ? RecurPartial<T[P]> : T[P]
+}
+
+/**
+ * Array extends Document so need a document that does not match an Array
+ * However, must also extend Document for `Schema[Property]` to be valid
+ */
+export type NonArrayObject = {
+  [x: string]: any
+  [y: number]: never
 }
 
 /**
@@ -53,7 +62,9 @@ export type WithStringOperator<Field> = Field extends string
  */
 export type WithArrayOperator<Field> = Field extends ReadonlyArray<infer T>
   ? {
-      $all?: T extends Document ? { $elemMatch: _RawFilter<T> }[] : T[]
+      $all?: T extends NonArrayObject
+        ? (T | { $elemMatch: WithOperator<T> })[]
+        : T[]
       $size?: number
     }
   : {}
@@ -67,10 +78,10 @@ export type WithNegatableOperator<Expr> =
     }
   | Expr
 
-export type WithRecordOperator<Schema> = Schema extends Document
+export type WithRecordOperator<Schema> = Schema extends NonArrayObject
   ?
       | {
-          [Property in keyof Schema]?: WithOperator<Schema[Property]>
+          [Property in keyof WithId<Schema>]?: WithOperator<Schema[Property]>
         }
       | {
           [Property in DotPaths<Schema>]?: FilterType<Schema, Property>
@@ -106,7 +117,7 @@ export declare type FilterType<
 > = string extends Property
   ? unknown
   : Property extends keyof Schema
-  ? Schema extends Document
+  ? Schema extends NonArrayObject
     ? WithOperator<Schema[Property]>
     : unknown
   : Property extends `${number}`
@@ -119,7 +130,7 @@ export declare type FilterType<
       ? FilterType<ArrayType, Rest>
       : unknown
     : Key extends keyof Schema
-    ? Schema[Key] extends Record<string, any>
+    ? Schema[Key] extends NonArrayObject
       ? FilterType<Schema[Key], Rest>
       : unknown
     : unknown
