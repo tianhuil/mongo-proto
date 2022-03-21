@@ -1,22 +1,18 @@
-import { Document } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import * as ta from 'type-assertions'
-import {
-  Filter,
-  PropertyType,
-  WithComparisonOperator,
-  WithNumericOperator,
-  WithOperator,
-} from './filter'
+import { Filter, FilterType, WithOperator } from './filter'
 
-// Test WithComparisonOperator number
-ta.assert<ta.Extends<{ $eq: 2 }, WithComparisonOperator<number>>>()
-ta.assert<ta.Not<ta.Extends<{ $eq: 'A' }, WithComparisonOperator<number>>>>()
-ta.assert<ta.Extends<{ $lt: 2 }, WithNumericOperator<number>>>()
+// Test WithOperator number
+ta.assert<ta.Extends<{ $eq: 2 }, WithOperator<number>>>()
+ta.assert<ta.Not<ta.Extends<{ $eq: 'A' }, WithOperator<number>>>>()
+ta.assert<ta.Extends<{ $lt: 2 }, WithOperator<number>>>()
 
-// Test WithComparisonOperator string
-ta.assert<ta.Extends<{ $eq: 'a' }, WithComparisonOperator<string>>>()
-ta.assert<ta.Not<ta.Extends<{ $lt: 'a' }, WithComparisonOperator<string>>>>()
-ta.assert<ta.Not<ta.Extends<{ $lt: 2 }, WithComparisonOperator<string>>>>()
+// Test WithOperator string
+ta.assert<ta.Extends<{ $eq: 'a' }, WithOperator<string>>>()
+const regex = { $regex: /hi/ }
+ta.assert<ta.Extends<typeof regex, WithOperator<string>>>()
+ta.assert<ta.Not<ta.Extends<{ $lt: 'a' }, WithOperator<string>>>>()
+ta.assert<ta.Not<ta.Extends<{ $lt: 2 }, WithOperator<string>>>>()
 
 // Test WithOperator number
 ta.assert<ta.Extends<{ $eq: 2 }, WithOperator<number>>>()
@@ -46,6 +42,8 @@ ta.assert<ta.Extends<{ $not: { $gt: 2 } }, WithOperator<number>>>()
 
 // Test WithOperator -- directly accessing value
 ta.assert<ta.Extends<4, WithOperator<number>>>()
+ta.assert<ta.Not<ta.Extends<'a', WithOperator<number>>>>()
+ta.assert<ta.Extends<'a', WithOperator<string>>>()
 
 // Test with $and
 ta.assert<ta.Extends<{ a: { $gt: 2 } }, Filter<{ a: number }>>>()
@@ -56,7 +54,15 @@ ta.assert<
   >
 >()
 
-//
+// Test $not operator
+ta.assert<ta.Extends<{ a: { $not: { $gt: 2 } } }, Filter<{ a: number }>>>()
+ta.assert<
+  ta.Extends<
+    { a: { $not: { $text: { $search: 'a' } } } },
+    Filter<{ a: string }>
+  >
+>()
+
 interface Example {
   a: number
   b: {
@@ -64,25 +70,33 @@ interface Example {
     d: {
       e: boolean
     }
+    f: ObjectId[]
   }
 }
 
-ta.assert<ta.Equal<PropertyType<Example, 'a'>, number>>()
-ta.assert<ta.Equal<PropertyType<Example, 'b.c'>, string>>()
-ta.assert<ta.Equal<PropertyType<Example, 'b.d.e'>, boolean>>()
-ta.assert<ta.Equal<PropertyType<Example, 'b.d'>, { e: boolean }>>()
+// Test FilterType - direct
+ta.assert<ta.Extends<number, FilterType<Example, 'a'>>>()
+ta.assert<ta.Extends<string, FilterType<Example, 'b.c'>>>()
+ta.assert<ta.Extends<boolean, FilterType<Example, 'b.d.e'>>>()
+ta.assert<ta.Extends<{ e: boolean }, FilterType<Example, 'b.d'>>>()
 ta.assert<
-  ta.Equal<
-    PropertyType<Example, 'b'>,
+  ta.Extends<
     {
       c: string
       d: {
         e: boolean
       }
-    }
+    },
+    FilterType<Example, 'b'>
   >
 >()
+ta.assert<ta.Extends<ObjectId[], FilterType<Example, 'a.b.f'>>>()
 
-type X = PropertyType<Example, 'a'>
-
-type Z = Example extends Document ? true : false
+// Test FilterType - with operators
+ta.assert<ta.Extends<{ $lt: 2 }, FilterType<Example, 'a'>>>()
+ta.assert<
+  ta.Extends<{ $text: { $search: 'hi' } }, FilterType<Example, 'b.c'>>
+>()
+ta.assert<ta.Extends<{ $exists: true }, FilterType<Example, 'b.d'>>>()
+ta.assert<ta.Extends<{ e: { $eq: false } }, FilterType<Example, 'b.d'>>>()
+ta.assert<ta.Extends<{ $size: 2 }, FilterType<Example, 'a.b.f'>>>()

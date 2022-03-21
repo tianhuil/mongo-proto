@@ -67,10 +67,21 @@ export type WithNegatableOperator<Expr> =
     }
   | Expr
 
+export type WithRecordOperator<Schema> = Schema extends Document
+  ?
+      | {
+          [Property in keyof Schema]?: WithOperator<Schema[Property]>
+        }
+      | {
+          [Property in DotPaths<Schema>]?: FilterType<Schema, Property>
+        }
+  : {}
+
 export type WithOperator<Field> =
   | RecurPartial<Field>
   | WithNegatableOperator<
       WithElementOperator &
+        WithRecordOperator<Field> &
         WithComparisonOperator<Field> &
         WithStringOperator<Field> &
         WithNumericOperator<Field> &
@@ -86,29 +97,17 @@ export type WithLogicalOperators<Field> = {
   $nor?: Filter<Field>[]
 }
 
-export type _RawFilter<Schema extends Document> =
-  | {
-      [Property in keyof Schema]?: Schema[Property] extends Document
-        ? WithOperator<_RawFilter<Schema[Property]>>
-        : WithOperator<Schema[Property]>
-    }
-  | {
-      [Property in DotPaths<Schema>]?: PropertyType<Schema, Property>
-    }
-
 /**
- * General formula for dot queries
+ * The type for a given dot path into a json object
  */
-export declare type PropertyType<
+export declare type FilterType<
   Schema,
   Property extends string
 > = string extends Property
   ? unknown
   : Property extends keyof Schema
   ? Schema extends Document
-    ? Schema[Property] extends Document
-      ? WithOperator<_RawFilter<Schema[Property]>>
-      : WithOperator<Schema[Property]>
+    ? WithOperator<Schema[Property]>
     : unknown
   : Property extends `${number}`
   ? Schema extends ReadonlyArray<infer ArrayType>
@@ -117,15 +116,15 @@ export declare type PropertyType<
   : Property extends `${infer Key}.${infer Rest}`
   ? Key extends `${number}`
     ? Schema extends ReadonlyArray<infer ArrayType>
-      ? PropertyType<ArrayType, Rest>
+      ? FilterType<ArrayType, Rest>
       : unknown
     : Key extends keyof Schema
     ? Schema[Key] extends Record<string, any>
-      ? PropertyType<Schema[Key], Rest>
+      ? FilterType<Schema[Key], Rest>
       : unknown
     : unknown
   : unknown
 
 export type Filter<Schema extends Document> =
-  | WithLogicalOperators<_RawFilter<Schema>>
-  | _RawFilter<Schema>
+  | WithLogicalOperators<WithOperator<Schema>>
+  | WithOperator<Schema>
