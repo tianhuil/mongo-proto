@@ -8,6 +8,7 @@ ta.assert<ta.Not<ta.Extends<{ a: 2; b: string }[], NonArrayObject>>>()
 
 // Test WithOperator number
 ta.assert<ta.Extends<{ $eq: 2 }, WithOperator<number>>>()
+ta.assert<ta.Extends<{ $nin: [2, 3] }, WithOperator<number>>>()
 ta.assert<ta.Not<ta.Extends<{ $eq: 'A' }, WithOperator<number>>>>()
 ta.assert<ta.Extends<{ $lt: 2 }, WithOperator<number>>>()
 
