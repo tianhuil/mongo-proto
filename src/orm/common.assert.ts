@@ -23,13 +23,13 @@ type TObj2 = typeof obj
 
 // Note: cannot use interface, must use type = { ... }
 ta.assert<ta.Not<ta.Extends<IObj, NonArrayObject>>>()
-ta.assert<ta.Extends<IObj, Record<string, any>>>()
+ta.assert<ta.Not<ta.Extends<IObj, Record<string, unknown>>>>()
 
 ta.assert<ta.Extends<TObj, NonArrayObject>>()
-ta.assert<ta.Extends<TObj, Record<string, any>>>()
+ta.assert<ta.Extends<TObj, Record<string, unknown>>>()
 
 ta.assert<ta.Extends<TObj2, NonArrayObject>>()
-ta.assert<ta.Extends<TObj2, Record<string, any>>>()
+ta.assert<ta.Extends<TObj2, Record<string, unknown>>>()
 
 ta.assert<ta.Extends<string, string | number>>()
 ta.assert<ta.Extends<string, unknown>>()

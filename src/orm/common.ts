@@ -1,5 +1,7 @@
 export type RecurPartial<T> = {
-  [P in keyof T]?: T[P] extends Record<string, any> ? RecurPartial<T[P]> : T[P]
+  [P in keyof T]?: T[P] extends Record<string, unknown>
+    ? RecurPartial<T[P]>
+    : T[P]
 }
 
 /**
@@ -7,6 +9,6 @@ export type RecurPartial<T> = {
  * However, must also extend Document for `Schema[Property]` to be valid
  */
 export type NonArrayObject = {
-  [x: string]: any
+  [x: string]: unknown
   [y: number]: never
 }
