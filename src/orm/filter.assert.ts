@@ -1,10 +1,6 @@
 import { ObjectId } from 'mongodb'
 import * as ta from 'type-assertions'
-import { Filter, FilterType, NonArrayObject, WithOperator } from './filter'
-
-// Test NonArrayObject
-ta.assert<ta.Extends<{ a: 2; b: string }, NonArrayObject>>()
-ta.assert<ta.Not<ta.Extends<{ a: 2; b: string }[], NonArrayObject>>>()
+import { Filter, FilterType, WithOperator } from './filter'
 
 // Test WithOperator number
 ta.assert<ta.Extends<{ $eq: 2 }, WithOperator<number>>>()
@@ -98,7 +94,7 @@ ta.assert<
   >
 >()
 
-interface Example {
+type Example = {
   a: number
   b: {
     c: string
@@ -109,9 +105,11 @@ interface Example {
   }
 }
 
-// Test FilterType - direct
 ta.assert<ta.Extends<number, FilterType<Example, 'a'>>>()
+ta.assert<ta.Not<ta.Extends<string, FilterType<Example, 'a'>>>>()
 ta.assert<ta.Extends<string, FilterType<Example, 'b.c'>>>()
+ta.assert<ta.Not<ta.Extends<number, FilterType<Example, 'b.c'>>>>()
+ta.assert<ta.Extends<boolean, FilterType<Example, 'b.d.e'>>>()
 ta.assert<ta.Extends<boolean, FilterType<Example, 'b.d.e'>>>()
 ta.assert<ta.Extends<{ e: boolean }, FilterType<Example, 'b.d'>>>()
 ta.assert<
@@ -125,7 +123,8 @@ ta.assert<
     FilterType<Example, 'b'>
   >
 >()
-ta.assert<ta.Extends<ObjectId[], FilterType<Example, 'a.b.f'>>>()
+ta.assert<ta.Extends<ObjectId[], FilterType<Example, 'b.f'>>>()
+ta.assert<ta.Extends<{ $size: 2 }, FilterType<Example, 'b.f'>>>()
 
 // Test FilterType - with operators
 ta.assert<ta.Extends<{ $lt: 2 }, FilterType<Example, 'a'>>>()
@@ -134,7 +133,7 @@ ta.assert<
 >()
 ta.assert<ta.Extends<{ $exists: true }, FilterType<Example, 'b.d'>>>()
 ta.assert<ta.Extends<{ e: { $eq: false } }, FilterType<Example, 'b.d'>>>()
-ta.assert<ta.Extends<{ $size: 2 }, FilterType<Example, 'a.b.f'>>>()
+ta.assert<ta.Extends<{ $size: 2 }, FilterType<Example, 'b.f'>>>()
 
 // These use to be wrong, keeping as regression testing
 ta.assert<ta.Not<ta.Extends<{ a: 2 }, WithOperator<{ a: number }[]>>>>()

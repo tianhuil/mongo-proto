@@ -1,18 +1,6 @@
 import { Document, WithId } from 'mongodb'
 import { DotPaths } from '../ts-mongodb'
-
-export type RecurPartial<T> = {
-  [P in keyof T]?: T[P] extends Record<string, any> ? RecurPartial<T[P]> : T[P]
-}
-
-/**
- * Array extends Document so need a document that does not match an Array
- * However, must also extend Document for `Schema[Property]` to be valid
- */
-export type NonArrayObject = {
-  [x: string]: any
-  [y: number]: never
-}
+import { NonArrayObject, RecurPartial } from './common'
 
 /**
  * https://docs.mongodb.com/manual/reference/operator/query-element/
@@ -115,26 +103,40 @@ export declare type FilterType<
   Schema,
   Property extends string
 > = string extends Property
-  ? unknown
+  ? never
   : Property extends keyof Schema
   ? Schema extends NonArrayObject
     ? WithOperator<Schema[Property]>
-    : unknown
+    : never
   : Property extends `${number}`
   ? Schema extends ReadonlyArray<infer ArrayType>
     ? ArrayType
-    : unknown
+    : never
   : Property extends `${infer Key}.${infer Rest}`
   ? Key extends `${number}`
     ? Schema extends ReadonlyArray<infer ArrayType>
       ? FilterType<ArrayType, Rest>
-      : unknown
+      : never
     : Key extends keyof Schema
     ? Schema[Key] extends NonArrayObject
       ? FilterType<Schema[Key], Rest>
-      : unknown
-    : unknown
-  : unknown
+      : never
+    : never
+  : never
+
+interface Example {
+  a: number
+  b: {
+    c: string
+    d: {
+      e: boolean
+    }
+  }
+}
+
+// Test FilterType - direct
+type X = FilterType<Example, 'a'>
+type Y = Example extends NonArrayObject ? true : false
 
 export type Filter<Schema extends Document> =
   | WithLogicalOperators<WithOperator<Schema>>
