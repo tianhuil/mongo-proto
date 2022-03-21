@@ -16,6 +16,16 @@ ta.assert<ta.Extends<{ $lt: 2 }, WithOperator<number>>>()
 ta.assert<ta.Extends<{ $eq: 'a' }, WithOperator<string>>>()
 const regex = { $regex: /hi/ }
 ta.assert<ta.Extends<typeof regex, WithOperator<string>>>()
+ta.assert<
+  ta.Extends<
+    {
+      $text: {
+        $search: 'a'
+      }
+    },
+    WithOperator<string>
+  >
+>()
 ta.assert<ta.Not<ta.Extends<{ $lt: 'a' }, WithOperator<string>>>>()
 ta.assert<ta.Not<ta.Extends<{ $lt: 2 }, WithOperator<string>>>>()
 
@@ -63,13 +73,14 @@ ta.assert<ta.Extends<{ a: [2, 3] }, WithOperator<{ a: number[] }>>>()
 
 // Test WithOperator negation
 ta.assert<ta.Extends<{ $not: { $gt: 2 } }, WithOperator<number>>>()
+ta.assert<ta.Not<ta.Extends<{ $not: { $eq: 2 } }, WithOperator<string>>>>()
 
 // Test WithOperator -- directly accessing value
 ta.assert<ta.Extends<4, WithOperator<number>>>()
 ta.assert<ta.Not<ta.Extends<'a', WithOperator<number>>>>()
 ta.assert<ta.Extends<'a', WithOperator<string>>>()
 
-// Test with $and
+// Test WithLogicalOperators
 ta.assert<ta.Extends<{ a: { $gt: 2 } }, Filter<{ a: number }>>>()
 ta.assert<
   ta.Extends<
