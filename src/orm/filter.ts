@@ -1,6 +1,6 @@
 import { Document, WithId } from 'mongodb'
 import { NonArrayObject, RecurPartial } from './common'
-import { FlattenPaths, FlattenType } from './dot'
+import { FlattenPaths, FlattenType } from './flatten'
 
 /**
  * https://docs.mongodb.com/manual/reference/operator/query-element/
