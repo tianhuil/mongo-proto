@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import * as ta from 'type-assertions'
-import { DotPaths } from './dot'
+import { FlattenPaths } from './flatten'
 
 interface Example {
   a: number
@@ -16,6 +16,6 @@ interface Example {
 ta.assert<
   ta.Equal<
     '_id' | 'a' | 'b' | 'b.c' | 'b.d.e' | 'b.d' | 'b.f' | `b.f.${number}`,
-    DotPaths<Example>
+    FlattenPaths<Example>
   >
 >()

@@ -42,7 +42,7 @@ export declare type NestedPaths<Type> = Type extends
     }[Extract<keyof Type, string>]
   : []
 
-export declare type DotPaths<Type> = Join<NestedPaths<WithId<Type>>, '.'>
+export declare type FlattenPaths<Type> = Join<NestedPaths<WithId<Type>>, '.'>
 
 export declare type FlattenType<
   Schema,

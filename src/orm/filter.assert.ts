@@ -94,6 +94,7 @@ ta.assert<
   >
 >()
 
+// Test FlattenPaths / FlattenType
 type Example = {
   a: number
   b: {
