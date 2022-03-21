@@ -1,4 +1,5 @@
 import { ObjectId, WithId } from 'mongodb'
+import { NonArrayObject } from './common'
 
 export declare type Join<T extends unknown[], D extends string> = T extends []
   ? ''
@@ -23,7 +24,7 @@ export declare type NestedPaths<Type> = Type extends
   ? []
   : Type extends ReadonlyArray<infer ArrayType>
   ? [number, ...NestedPaths<ArrayType>]
-  : Type extends Map<string, any>
+  : Type extends Map<string, unknown>
   ? [string]
   : Type extends object
   ? {
@@ -42,3 +43,28 @@ export declare type NestedPaths<Type> = Type extends
   : []
 
 export declare type DotPaths<Type> = Join<NestedPaths<WithId<Type>>, '.'>
+
+export declare type FlattenType<
+  Schema,
+  Property extends string
+> = string extends Property
+  ? never
+  : Property extends keyof Schema
+  ? Schema extends NonArrayObject
+    ? Schema[Property]
+    : never
+  : Property extends `${number}`
+  ? Schema extends ReadonlyArray<infer ArrayType>
+    ? ArrayType
+    : never
+  : Property extends `${infer Key}.${infer Rest}`
+  ? Key extends `${number}`
+    ? Schema extends ReadonlyArray<infer ArrayType>
+      ? FlattenType<ArrayType, Rest>
+      : never
+    : Key extends keyof Schema
+    ? Schema[Key] extends NonArrayObject
+      ? FlattenType<Schema[Key], Rest>
+      : never
+    : never
+  : never

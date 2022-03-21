@@ -1,6 +1,7 @@
 import { Document, WithId } from 'mongodb'
 import { DotPaths } from '../ts-mongodb'
 import { NonArrayObject, RecurPartial } from './common'
+import { FlattenType } from './dot'
 
 /**
  * https://docs.mongodb.com/manual/reference/operator/query-element/
@@ -98,45 +99,11 @@ export type WithLogicalOperators<Field> = {
 
 /**
  * The type for a given dot path into a json object
+ * NB: must be maintained as a separate type function
  */
-export declare type FilterType<
-  Schema,
-  Property extends string
-> = string extends Property
-  ? never
-  : Property extends keyof Schema
-  ? Schema extends NonArrayObject
-    ? WithOperator<Schema[Property]>
-    : never
-  : Property extends `${number}`
-  ? Schema extends ReadonlyArray<infer ArrayType>
-    ? ArrayType
-    : never
-  : Property extends `${infer Key}.${infer Rest}`
-  ? Key extends `${number}`
-    ? Schema extends ReadonlyArray<infer ArrayType>
-      ? FilterType<ArrayType, Rest>
-      : never
-    : Key extends keyof Schema
-    ? Schema[Key] extends NonArrayObject
-      ? FilterType<Schema[Key], Rest>
-      : never
-    : never
-  : never
-
-interface Example {
-  a: number
-  b: {
-    c: string
-    d: {
-      e: boolean
-    }
-  }
-}
-
-// Test FilterType - direct
-type X = FilterType<Example, 'a'>
-type Y = Example extends NonArrayObject ? true : false
+export declare type FilterType<Schema, Property extends string> = WithOperator<
+  FlattenType<Schema, Property>
+>
 
 export type Filter<Schema extends Document> =
   | WithLogicalOperators<WithOperator<Schema>>
