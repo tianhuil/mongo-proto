@@ -1,5 +1,21 @@
 import * as ta from 'type-assertions'
-import { NonArrayObject } from './common'
+import { NonArrayObject, RecurPartial } from './common'
+
+// Test RecurPartial
+type Example = {
+  a: string
+  b: {
+    c: number
+  }
+  d: Date[]
+}
+
+ta.assert<ta.Extends<{ a?: string }, RecurPartial<Example>>>()
+ta.assert<ta.Not<ta.Extends<{ z?: string }, RecurPartial<Example>>>>()
+ta.assert<ta.Extends<{ b?: { c?: number } }, RecurPartial<Example>>>()
+ta.assert<ta.Not<ta.Extends<{ b?: { z: number } }, RecurPartial<Example>>>>()
+ta.assert<ta.Extends<{ d?: Date[] }, RecurPartial<Example>>>()
+ta.assert<ta.Not<ta.Extends<{ d?: number[] }, RecurPartial<Example>>>>()
 
 // Test NonArrayObject
 ta.assert<ta.Extends<{ a: 2; b: string }, NonArrayObject>>()

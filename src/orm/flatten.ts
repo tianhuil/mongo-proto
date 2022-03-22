@@ -1,5 +1,5 @@
-import { ObjectId, WithId } from 'mongodb'
-import { NonArrayObject } from './common'
+import { WithId } from 'mongodb'
+import { BaseTypes, NonArrayObject } from './common'
 
 export declare type FlattenFilterPaths<Type> = Join<
   NestedPaths<WithId<Type>, number>,
@@ -33,18 +33,7 @@ declare type Join<T extends unknown[], D extends string> = T extends []
   ? `${T[0]}${D}${Join<R, D>}`
   : string
 
-declare type NestedPaths<Type, ArrayIndexType> = Type extends
-  | string
-  | number
-  | boolean
-  | Date
-  | RegExp
-  | Buffer
-  | Uint8Array
-  | ObjectId
-  | {
-      _bsontype: string
-    }
+declare type NestedPaths<Type, ArrayIndexType> = Type extends BaseTypes
   ? []
   : Type extends ReadonlyArray<infer ArrayType>
   ? ArrayType extends NonArrayObject
@@ -72,7 +61,9 @@ declare type _FlattenFilterType<
   ArrayHolder extends string
 > = string extends Property
   ? never
-  : Property extends keyof Schema
+  : Schema extends BaseTypes
+  ? Schema
+  : Property extends keyof Schema // Simple key
   ? Schema extends NonArrayObject
     ? Schema[Property]
     : never
@@ -80,7 +71,7 @@ declare type _FlattenFilterType<
   ? Schema extends ReadonlyArray<infer ArrayType>
     ? ArrayType
     : never
-  : Property extends `${infer Key}.${infer Rest}`
+  : Property extends `${infer Key}.${infer Rest}` // Compound key
   ? Key extends ArrayHolder
     ? Schema extends ReadonlyArray<infer ArrayType>
       ? _FlattenFilterType<ArrayType, Rest, ArrayHolder>
