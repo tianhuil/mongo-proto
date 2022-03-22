@@ -57,10 +57,10 @@ type _FlattenType<Schema, Property extends string> = string extends Property
   : Property extends `${infer Key}.${infer Rest}`
   ? Key extends `${number}`
     ? Schema extends ReadonlyArray<infer ArrayType>
-      ? FlattenType<ArrayType, Rest>
+      ? _FlattenType<ArrayType, Rest>
       : never
     : Key extends keyof Schema
-    ? FlattenType<Schema[Key], Rest>
+    ? _FlattenType<Schema[Key], Rest>
     : never
   : never
 
