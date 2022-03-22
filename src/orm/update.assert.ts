@@ -14,7 +14,7 @@ type Example = {
   g: number
 }
 
-// Test FilterFlattenPaths
+// Test SelectFlattenUpdatePaths
 ta.assert<ta.Equal<'a', SelectFlattenUpdatePaths<Example, string>>>()
 ta.assert<ta.Not<ta.Equal<'z', SelectFlattenUpdatePaths<Example, string>>>>()
 ta.assert<ta.Not<ta.Equal<'a', SelectFlattenUpdatePaths<Example, number>>>>()
@@ -35,7 +35,7 @@ ta.assert<
   >
 >()
 
-// Test FilterFlattenTypes
+// Test UpdateFlattenTypes
 ta.assert<ta.Equal<{ a?: string }, UpdateFlattenTypes<Example, string>>>()
 ta.assert<ta.Extends<{ 'b.c': number }, UpdateFlattenTypes<Example, number>>>()
 ta.assert<
@@ -53,9 +53,13 @@ ta.assert<
 >()
 ta.assert<ta.Extends<{ 'd.$': true }, UpdateFlattenTypes<Example, boolean>>>()
 
-type X = UpdateFlattenTypes<Example, boolean>
+// Test UpdateFlattenTypes on unknown
+// note that if this has type `b?: {c: number}`, i.e. that c is required
+// this is because update sets the entire record for b
+// to set one record, use dot notation
+ta.assert<ta.Extends<Partial<Example>, UpdateFlattenTypes<Example, unknown>>>()
 
-// Testing things that don't match (TODO, fix this!)
+// Testing non-existing fields
 ta.assert<ta.Extends<{}, UpdateFlattenTypes<Example, string>>>()
 ta.assert<
   ta.Not<ta.Extends<{ z: number }, UpdateFlattenTypes<Example, number>>>
