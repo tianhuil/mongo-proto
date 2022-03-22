@@ -9,7 +9,7 @@ export declare type Join<T extends unknown[], D extends string> = T extends []
   ? `${T[0]}${D}${Join<R, D>}`
   : string
 
-export declare type NestedPaths<Type> = Type extends
+export declare type NestedPaths<Type, ArrayIndexType> = Type extends
   | string
   | number
   | boolean
@@ -23,26 +23,28 @@ export declare type NestedPaths<Type> = Type extends
     }
   ? []
   : Type extends ReadonlyArray<infer ArrayType>
-  ? [number, ...NestedPaths<ArrayType>] | [number]
+  ?
+      | [ArrayIndexType, ...NestedPaths<ArrayType, ArrayIndexType>]
+      | [ArrayIndexType]
   : Type extends Map<string, unknown>
   ? [string]
   : Type extends object
   ? {
-      [Key in Extract<keyof Type, string>]: Type[Key] extends Type
-        ? [Key]
-        : Type extends Type[Key]
-        ? [Key]
-        : Type[Key] extends ReadonlyArray<infer ArrayType>
-        ? Type extends ArrayType
-          ? [Key]
-          : ArrayType extends Type
-          ? [Key]
-          : [Key, ...NestedPaths<Type[Key]>] | [Key]
-        : [Key, ...NestedPaths<Type[Key]>] | [Key]
+      [Key in Extract<keyof Type, string>]:
+        | [Key, ...NestedPaths<Type[Key], ArrayIndexType>]
+        | [Key]
     }[Extract<keyof Type, string>]
   : []
 
-export declare type FlattenPaths<Type> = Join<NestedPaths<WithId<Type>>, '.'>
+export declare type FlattenFilterPaths<Type> = Join<
+  NestedPaths<WithId<Type>, number>,
+  '.'
+>
+
+export declare type FlattenUpdatePaths<Type> = Join<
+  NestedPaths<WithId<Type>, number>,
+  '.'
+>
 
 type _FlattenType<Schema, Property extends string> = string extends Property
   ? never

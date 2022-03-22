@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import * as ta from 'type-assertions'
-import { FlattenPaths, FlattenType } from './flatten'
+import { FlattenFilterPaths, FlattenType } from './flatten'
 
 type Example = {
   a: number
@@ -29,7 +29,7 @@ ta.assert<
     | 'g'
     | `g.${number}`
     | `g.${number}.h`,
-    FlattenPaths<Example>
+    FlattenFilterPaths<Example>
   >
 >()
 

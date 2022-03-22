@@ -1,6 +1,6 @@
 import { Document, WithId } from 'mongodb'
 import { NonArrayObject, RecurPartial } from './common'
-import { FlattenPaths, FlattenType } from './flatten'
+import { FlattenFilterPaths, FlattenType } from './flatten'
 
 /**
  * https://docs.mongodb.com/manual/reference/operator/query-element/
@@ -72,7 +72,10 @@ export type WithRecordOperator<Schema> = Schema extends NonArrayObject
           [Property in keyof WithId<Schema>]?: WithOperator<Schema[Property]>
         }
       | {
-          [Property in FlattenPaths<Schema>]?: FilterType<Schema, Property>
+          [Property in FlattenFilterPaths<Schema>]?: FilterType<
+            Schema,
+            Property
+          >
         }
   : {}
 
