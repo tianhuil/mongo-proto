@@ -1,29 +1,39 @@
 import { Document } from 'mongodb'
-import { FlattenFilterPaths, FlattenType } from './flatten'
+import { FlattenUpdatePaths, FlattenUpdateType } from './flatten'
 
 export declare type Update<Schema extends Document> = {
-  $max?: FilterFlattenTypes<Schema, number | Date>
-  $inc?: FilterFlattenTypes<Schema, number>
-  $mul?: FilterFlattenTypes<Schema, number>
-  $min?: FilterFlattenTypes<Schema, number | Date>
-  $currentDate?: FilterFlattenTypes<Schema, Date>
+  $max?: UpdateFlattenTypes<Schema, number | Date>
+  $inc?: UpdateFlattenTypes<Schema, number>
+  $mul?: UpdateFlattenTypes<Schema, number>
+  $min?: UpdateFlattenTypes<Schema, number | Date>
+  $currentDate?: UpdateFlattenTypes<Schema, Date>
+
+  // Array methods
+  $push?: UpdateFlattenTypes<Schema, Array<unknown>>
+  $pop?: UpdateFlattenTypes<Schema, Date>
 }
 
-export declare type FilterFlattenPaths<TSchema, KeepType> = {
-  readonly [Property in FlattenFilterPaths<TSchema>]: Property extends string
-    ? FlattenType<TSchema, Property> extends KeepType
+export declare type SelectFlattenUpdatePaths<TSchema, KeepType> = {
+  readonly [Property in FlattenUpdatePaths<TSchema>]: Property extends string
+    ? FlattenUpdateType<TSchema, Property> extends KeepType
       ? Property
       : never
     : never
-}[FlattenFilterPaths<TSchema>]
+}[FlattenUpdatePaths<TSchema>]
 
-export declare type FilterFlattenTypes<TSchema, KeepType> = {
-  readonly [Property in FilterFlattenPaths<
+export declare type UpdateFlattenTypes<
+  TSchema,
+  KeepType,
+  AssignType = unknown
+> = {
+  readonly [Property in SelectFlattenUpdatePaths<
     TSchema,
     KeepType
   >]?: Property extends string
-    ? FlattenType<TSchema, Property> extends KeepType
-      ? FlattenType<TSchema, Property>
+    ? FlattenUpdateType<TSchema, Property> extends KeepType
+      ? unknown extends AssignType
+        ? FlattenUpdateType<TSchema, Property>
+        : AssignType
       : never
     : never
 }

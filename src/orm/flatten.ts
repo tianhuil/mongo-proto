@@ -1,7 +1,29 @@
 import { ObjectId, WithId } from 'mongodb'
 import { NonArrayObject } from './common'
 
-export declare type Join<T extends unknown[], D extends string> = T extends []
+export declare type FlattenFilterPaths<Type> = Join<
+  NestedPaths<WithId<Type>, number>,
+  '.'
+>
+
+type UpdateArrayHolder = '$' | '$[]'
+
+export declare type FlattenUpdatePaths<Type> = Join<
+  NestedPaths<WithId<Type>, UpdateArrayHolder>,
+  '.'
+>
+
+export declare type FlattenFilterType<
+  Schema,
+  Property extends string
+> = _FlattenFilterType<WithId<Schema>, Property, `${number}`>
+
+export declare type FlattenUpdateType<
+  Schema,
+  Property extends string
+> = _FlattenFilterType<WithId<Schema>, Property, UpdateArrayHolder>
+
+declare type Join<T extends unknown[], D extends string> = T extends []
   ? ''
   : T extends [string | number]
   ? `${T[0]}`
@@ -9,7 +31,7 @@ export declare type Join<T extends unknown[], D extends string> = T extends []
   ? `${T[0]}${D}${Join<R, D>}`
   : string
 
-export declare type NestedPaths<Type, ArrayIndexType> = Type extends
+declare type NestedPaths<Type, ArrayIndexType> = Type extends
   | string
   | number
   | boolean
@@ -42,41 +64,30 @@ export declare type NestedPaths<Type, ArrayIndexType> = Type extends
     }[Extract<keyof Type, string>]
   : []
 
-export declare type FlattenFilterPaths<Type> = Join<
-  NestedPaths<WithId<Type>, number>,
-  '.'
->
-
-export declare type FlattenUpdatePaths<Type> = Join<
-  NestedPaths<WithId<Type>, number>,
-  '$' | '$[]'
->
-
-type _FlattenType<Schema, Property extends string> = string extends Property
+declare type _FlattenFilterType<
+  Schema,
+  Property extends string,
+  ArrayHolder extends string
+> = string extends Property
   ? never
   : Property extends keyof Schema
   ? Schema extends NonArrayObject
     ? Schema[Property]
     : never
-  : Property extends `${number}`
+  : Property extends ArrayHolder
   ? Schema extends ReadonlyArray<infer ArrayType>
     ? ArrayType
     : never
   : Property extends `${infer Key}.${infer Rest}`
-  ? Key extends `${number}`
+  ? Key extends ArrayHolder
     ? Schema extends ReadonlyArray<infer ArrayType>
-      ? _FlattenType<ArrayType, Rest>
+      ? _FlattenFilterType<ArrayType, Rest, ArrayHolder>
       : never
     : Key extends keyof Schema
-    ? _FlattenType<Schema[Key], Rest>
+    ? _FlattenFilterType<Schema[Key], Rest, ArrayHolder>
     : never
   : Schema extends ReadonlyArray<infer ArrayType> // Can omit index for array of objects
   ? ArrayType extends NonArrayObject
-    ? _FlattenType<ArrayType, Property>
+    ? _FlattenFilterType<ArrayType, Property, ArrayHolder>
     : never
   : never
-
-export declare type FlattenType<Schema, Property extends string> = _FlattenType<
-  WithId<Schema>,
-  Property
->
