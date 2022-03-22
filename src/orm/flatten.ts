@@ -23,9 +23,15 @@ export declare type NestedPaths<Type, ArrayIndexType> = Type extends
     }
   ? []
   : Type extends ReadonlyArray<infer ArrayType>
-  ?
-      | [ArrayIndexType, ...NestedPaths<ArrayType, ArrayIndexType>]
-      | [ArrayIndexType]
+  ? ArrayType extends NonArrayObject
+    ? // Can omit index for array of objects
+      // https://docs.mongodb.com/manual/tutorial/query-array-of-documents/#combination-of-elements-satisfies-the-criteria
+      | NestedPaths<ArrayType, ArrayIndexType>
+        | [ArrayIndexType, ...NestedPaths<ArrayType, ArrayIndexType>]
+        | [ArrayIndexType] // Can stop at array
+    :
+        | [ArrayIndexType, ...NestedPaths<ArrayType, ArrayIndexType>]
+        | [ArrayIndexType] // Can stop at array
   : Type extends Map<string, unknown>
   ? [string]
   : Type extends object
@@ -43,7 +49,7 @@ export declare type FlattenFilterPaths<Type> = Join<
 
 export declare type FlattenUpdatePaths<Type> = Join<
   NestedPaths<WithId<Type>, number>,
-  '.'
+  '$' | '$[]'
 >
 
 type _FlattenType<Schema, Property extends string> = string extends Property
@@ -63,6 +69,10 @@ type _FlattenType<Schema, Property extends string> = string extends Property
       : never
     : Key extends keyof Schema
     ? _FlattenType<Schema[Key], Rest>
+    : never
+  : Schema extends ReadonlyArray<infer ArrayType> // Can omit index for array of objects
+  ? ArrayType extends NonArrayObject
+    ? _FlattenType<ArrayType, Property>
     : never
   : never
 

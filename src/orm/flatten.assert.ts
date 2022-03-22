@@ -28,7 +28,8 @@ ta.assert<
     | `f.${number}`
     | 'g'
     | `g.${number}`
-    | `g.${number}.h`,
+    | `g.${number}.h`
+    | 'g.h',
     FlattenFilterPaths<Example>
   >
 >()
@@ -47,3 +48,5 @@ ta.assert<ta.Equal<FlattenType<Example, 'f.4'>, ObjectId>>()
 ta.assert<ta.Equal<FlattenType<Example, 'g'>, { h: number }[]>>()
 ta.assert<ta.Equal<FlattenType<Example, 'g.0'>, { h: number }>>()
 ta.assert<ta.Equal<FlattenType<Example, 'g.0.h'>, number>>()
+ta.assert<ta.Equal<FlattenType<Example, 'g.h'>, number>>()
+ta.assert<ta.Equal<FlattenType<Example, 'z'>, never>>()

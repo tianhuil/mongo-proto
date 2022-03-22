@@ -26,7 +26,10 @@ ta.assert<ta.Not<ta.Extends<'d.x', FilterFlattenPaths<Example, boolean>>>>()
 ta.assert<ta.Not<ta.Equal<`d`, FilterFlattenPaths<Example, boolean>>>>()
 ta.assert<ta.Not<ta.Equal<`d`, FilterFlattenPaths<Example, boolean>>>>()
 ta.assert<
-  ta.Equal<'_id' | `e.${number}.f`, FilterFlattenPaths<Example, ObjectId>>
+  ta.Equal<
+    '_id' | 'e.f' | `e.${number}.f`,
+    FilterFlattenPaths<Example, ObjectId>
+  >
 >()
 
 // Test FilterFlattenTypes
