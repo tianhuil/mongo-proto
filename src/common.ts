@@ -47,3 +47,20 @@ export const fetchIds = async <T extends Document>(
 
   return results.map((x) => x._id as ObjectId).toArray()
 }
+
+// https://stackoverflow.com/a/62099607/8930600
+export declare type Strict<T extends Record<string, any>> = T & {
+  [K in ExcludedKeys<T & string>]: never
+}
+
+type ExcludedKeys<ExcludedLiterals extends string> = keyof Omit<
+  { [Key in string]: never },
+  ExcludedLiterals
+>
+
+type Impossible<K extends keyof any> = {
+  [P in K]: never
+}
+
+type NoExtraProperties<T, U extends T = T> = U &
+  Impossible<Exclude<keyof U, keyof T>>
