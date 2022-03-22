@@ -1,5 +1,5 @@
 import { Document } from 'mongodb'
-import { FlattenPaths, FlattenType } from './flatten'
+import { FlattenFilterPaths, FlattenType } from './flatten'
 
 export declare type Update<Schema extends Document> = {
   $max?: FilterFlattenTypes<Schema, number | Date>
@@ -10,15 +10,18 @@ export declare type Update<Schema extends Document> = {
 }
 
 export declare type FilterFlattenPaths<TSchema, KeepType> = {
-  [Property in FlattenPaths<TSchema>]: Property extends string
+  readonly [Property in FlattenFilterPaths<TSchema>]: Property extends string
     ? FlattenType<TSchema, Property> extends KeepType
       ? Property
       : never
     : never
-}[FlattenPaths<TSchema>]
+}[FlattenFilterPaths<TSchema>]
 
 export declare type FilterFlattenTypes<TSchema, KeepType> = {
-  [Property in FilterFlattenPaths<TSchema, KeepType>]?: Property extends string
+  readonly [Property in FilterFlattenPaths<
+    TSchema,
+    KeepType
+  >]?: Property extends string
     ? FlattenType<TSchema, Property> extends KeepType
       ? FlattenType<TSchema, Property>
       : never
