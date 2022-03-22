@@ -6,6 +6,8 @@ export declare type FlattenFilterPaths<Type> = Join<
   '.'
 >
 
+// Do not allow numeric index because that weakens type-checking
+// (the resulting template literal does not check for extra keys)
 type UpdateArrayHolder = '$' | '$[]'
 
 export declare type FlattenUpdatePaths<Type> = Join<
