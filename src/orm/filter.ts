@@ -1,6 +1,6 @@
 import { Document, WithId } from 'mongodb'
 import { NonArrayObject, RecurPartial } from './common'
-import { FlattenFilterPaths, FlattenType } from './flatten'
+import { FlattenFilterPaths, FlattenFilterType } from './flatten'
 
 /**
  * https://docs.mongodb.com/manual/reference/operator/query-element/
@@ -106,7 +106,7 @@ export type WithLogicalOperators<Field> = {
  * NB: must be maintained as a separate type function
  */
 export declare type FilterType<Schema, Property extends string> = WithOperator<
-  FlattenType<Schema, Property>
+  FlattenFilterType<Schema, Property>
 >
 
 export type Filter<Schema extends Document> =
