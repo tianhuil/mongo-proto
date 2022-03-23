@@ -27,7 +27,7 @@ By default, we only allow you to select the 0'th element.  This solves the probl
 - In general, we believe it's not typesafe to select arbitrarily into an array so allowing an arbitrary number is probably not great programming practice.
 
 ## Roadmap
-- Aggregation
+- Aggregation (still incomplete)
 - Mapreduce
 - Geography Operators
 - Bit Operators
