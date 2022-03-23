@@ -56,15 +56,11 @@ ta.assert<
   >
 >()
 
-// Test WithOperator equivalence
+// Test Filter equivalence
 // https://docs.mongodb.com/manual/reference/operator/query/all/
-ta.assert<
-  ta.Extends<{ $all: [{ a: 2 }, { a: 2 }] }, WithOperator<{ a: number[] }>>
->()
-ta.assert<ta.Extends<{ a: { $all: [2, 3] } }, WithOperator<{ a: number[] }>>>()
-ta.assert<
-  ta.Extends<{ $and: [{ a: [2, 3] }] }, WithOperator<{ a: number[] }>>
->()
+ta.assert<ta.Extends<{ a: [2, 3] }, Filter<{ a: number[] }>>>()
+ta.assert<ta.Extends<{ a: { $all: [2, 3] } }, Filter<{ a: number[] }>>>()
+ta.assert<ta.Extends<{ $and: [{ a: [2, 3] }] }, Filter<{ a: number[] }>>>()
 ta.assert<ta.Extends<{ a: [2, 3] }, WithOperator<{ a: number[] }>>>()
 
 // Test WithOperator negation
@@ -80,7 +76,7 @@ ta.assert<ta.Extends<'a', WithOperator<string>>>()
 ta.assert<ta.Extends<{ a: { $gt: 2 } }, Filter<{ a: number }>>>()
 ta.assert<
   ta.Extends<
-    { $and: [{ a: { $gt: 2 } }, { a: { $le: 5 } }] },
+    { $and: [{ a: { $gt: 2 } }, { a: { $lt: 5 } }] },
     Filter<{ a: number }>
   >
 >()
@@ -138,3 +134,7 @@ ta.assert<ta.Extends<{ $size: 2 }, FilterType<Example, 'b.f'>>>()
 
 // These use to be wrong, keeping as regression testing
 ta.assert<ta.Not<ta.Extends<{ a: 2 }, WithOperator<{ a: number }[]>>>>()
+
+// Disallow extraneous fields, except when index supports number
+ta.assert<ta.Not<ta.Extends<{ z: 2 }, Filter<{ a: number; b: string[] }>>>>()
+ta.assert<ta.Extends<{ z: 2 }, Filter<{ a: number; b: string[] }, number>>>()

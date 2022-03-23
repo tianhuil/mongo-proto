@@ -1,10 +1,10 @@
 import { WithId } from 'mongodb'
 import { BaseTypes, NonArrayObject } from './util'
 
-export declare type FlattenFilterPaths<Type> = Join<
-  NestedPaths<WithId<Type>, number>,
-  '.'
->
+export declare type FlattenFilterPaths<
+  Type,
+  IndexType extends number = 0
+> = Join<NestedPaths<WithId<Type>, IndexType>, '.'>
 
 // Do not allow numeric index because that weakens type-checking
 // (the resulting template literal does not check for extra keys)

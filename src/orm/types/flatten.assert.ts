@@ -30,12 +30,30 @@ ta.assert<
     | 'b.d.e'
     | 'b.d'
     | 'f'
+    | `f.0`
+    | 'g'
+    | `g.0`
+    | `g.0.h`
+    | 'g.h',
+    FlattenFilterPaths<Example>
+  >
+>()
+
+ta.assert<
+  ta.Equal<
+    | '_id'
+    | 'a'
+    | 'b'
+    | 'b.c'
+    | 'b.d.e'
+    | 'b.d'
+    | 'f'
     | `f.${number}`
     | 'g'
     | `g.${number}`
     | `g.${number}.h`
     | 'g.h',
-    FlattenFilterPaths<Example>
+    FlattenFilterPaths<Example, number>
   >
 >()
 

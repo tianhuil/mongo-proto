@@ -16,8 +16,8 @@ export type WithElementOperator = {
 export type WithComparisonOperator<Field> = {
   $eq?: Field
   $ne?: Field
-  $in?: Field[]
-  $nin?: Field[]
+  $in?: readonly Field[]
+  $nin?: readonly Field[]
 }
 
 export type WithNumericOperator<Field> = Field extends number
@@ -66,20 +66,23 @@ export type WithNegatableOperator<Expr> =
     }
   | Expr
 
-export type WithRecordOperator<Schema> = Schema extends NonArrayObject
+export type WithRecordOperator<
+  Schema,
+  IndexType extends number = 0
+> = Schema extends NonArrayObject
   ? {
-      readonly [Property in FlattenFilterPaths<WithId<Schema>>]?: FilterType<
-        Schema,
-        Property
-      >
+      readonly [Property in FlattenFilterPaths<
+        WithId<Schema>,
+        IndexType
+      >]?: FilterType<Schema, Property>
     }
   : {}
 
-export type WithOperator<Field> =
+export type WithOperator<Field, IndexType extends number = 0> =
   | RecurPartial<Field>
   | WithNegatableOperator<
       WithElementOperator &
-        WithRecordOperator<Field> &
+        WithRecordOperator<Field, IndexType> &
         WithComparisonOperator<Field> &
         WithStringOperator<Field> &
         WithNumericOperator<Field> &
@@ -89,11 +92,13 @@ export type WithOperator<Field> =
 /**
  * https://docs.mongodb.com/manual/reference/operator/query-logical/
  */
-export type WithLogicalOperators<Field> = {
-  $and?: Filter<Field>[]
-  $or?: Filter<Field>[]
-  $nor?: Filter<Field>[]
-}
+export type WithLogicalOperators<Field> =
+  | Field
+  | {
+      $and?: readonly Field[]
+      $or?: readonly Field[]
+      $nor?: readonly Field[]
+    }
 
 /**
  * The type for a given dot path into a json object
@@ -103,6 +108,7 @@ export declare type FilterType<Schema, Property extends string> = WithOperator<
   FlattenFilterType<Schema, Property>
 >
 
-export type Filter<Schema extends Document> =
-  | WithLogicalOperators<WithOperator<Schema>>
-  | WithOperator<Schema>
+export type Filter<
+  Schema extends Document,
+  IndexType extends number = 0
+> = WithLogicalOperators<WithOperator<Schema, IndexType>>
