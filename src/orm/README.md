@@ -29,3 +29,5 @@ By default, we only allow you to select the 0'th element.  This solves the probl
 ## Roadmap
 - Aggregation
 - Mapreduce
+- Geography Operators
+- Bit Operators
