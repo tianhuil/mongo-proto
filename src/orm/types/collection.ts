@@ -1,5 +1,5 @@
 import {
-  BulkWriteOptions,
+  AggregateOptions,
   Callback,
   CountDocumentsOptions,
   CreateIndexesOptions,
@@ -8,18 +8,14 @@ import {
   DistinctOptions,
   Document,
   Flatten,
-  InsertManyResult,
-  InsertOneOptions,
-  InsertOneResult,
   ModifyResult,
-  OperationOptions,
-  OptionalUnlessRequiredId,
   ReplaceOptions,
   UpdateOptions,
   UpdateResult,
   WithId,
   WithoutId,
 } from 'mongodb'
+import { TsAggregationCursor } from './aggregation'
 import { Filter } from './filter'
 import {
   TsFindCursor,
@@ -32,56 +28,6 @@ import { IndexSpecification } from './mongo-index'
 import { Update } from './update'
 
 export declare class SafeCollection<TSchema extends Document> {
-  /**
-   * Inserts a single document into MongoDB. If documents passed in do not contain the **_id** field,
-   * one will be added to each of the documents missing it by the driver, mutating the document. This behavior
-   * can be overridden by setting the **forceServerObjectId** flag.
-   *
-   * @param doc - The document to insert
-   * @param options - Optional settings for the command
-   * @param callback - An optional callback, a Promise will be returned if none is provided
-   */
-  insertOne(
-    doc: OptionalUnlessRequiredId<TSchema>
-  ): Promise<InsertOneResult<TSchema>>
-  insertOne(
-    doc: OptionalUnlessRequiredId<TSchema>,
-    callback: Callback<InsertOneResult<TSchema>>
-  ): void
-  insertOne(
-    doc: OptionalUnlessRequiredId<TSchema>,
-    options: InsertOneOptions
-  ): Promise<InsertOneResult<TSchema>>
-  insertOne(
-    doc: OptionalUnlessRequiredId<TSchema>,
-    options: InsertOneOptions,
-    callback: Callback<InsertOneResult<TSchema>>
-  ): void
-  /**
-   * Inserts an array of documents into MongoDB. If documents passed in do not contain the **_id** field,
-   * one will be added to each of the documents missing it by the driver, mutating the document. This behavior
-   * can be overridden by setting the **forceServerObjectId** flag.
-   *
-   * @param docs - The documents to insert
-   * @param options - Optional settings for the command
-   * @param callback - An optional callback, a Promise will be returned if none is provided
-   */
-  insertMany(
-    docs: OptionalUnlessRequiredId<TSchema>[]
-  ): Promise<InsertManyResult<TSchema>>
-  insertMany(
-    docs: OptionalUnlessRequiredId<TSchema>[],
-    callback: Callback<InsertManyResult<TSchema>>
-  ): void
-  insertMany(
-    docs: OptionalUnlessRequiredId<TSchema>[],
-    options: BulkWriteOptions
-  ): Promise<InsertManyResult<TSchema>>
-  insertMany(
-    docs: OptionalUnlessRequiredId<TSchema>[],
-    options: BulkWriteOptions,
-    callback: Callback<InsertManyResult<TSchema>>
-  ): void
   /**
    * Update a single document in a collection
    *
@@ -251,16 +197,6 @@ export declare class SafeCollection<TSchema extends Document> {
     filter: Filter<TSchema>,
     options?: TsFindOptions<TSchema>
   ): TsFindCursor<T>
-  /**
-   * Returns the options of the collection.
-   *
-   * @param options - Optional settings for the command
-   * @param callback - An optional callback, a Promise will be returned if none is provided
-   */
-  options(): Promise<Document>
-  options(callback: Callback<Document>): void
-  options(options: OperationOptions): Promise<Document>
-  options(options: OperationOptions, callback: Callback<Document>): void
   /**
    * Creates an index on the db and collection collection.
    *
@@ -444,19 +380,6 @@ export declare class SafeCollection<TSchema extends Document> {
     options: DistinctOptions,
     callback: Callback<any[]>
   ): void
-  // /**
-  //  * Retrieve all the indexes on the collection.
-  //  *
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  */
-  // indexes(): Promise<Document[]>
-  // indexes(callback: Callback<Document[]>): void
-  // indexes(options: IndexInformationOptions): Promise<Document[]>
-  // indexes(
-  //   options: IndexInformationOptions,
-  //   callback: Callback<Document[]>
-  // ): void
   /**
    * Find a document and delete it in one atomic operation. Requires a write lock for the duration of the operation.
    *
