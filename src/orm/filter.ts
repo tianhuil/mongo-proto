@@ -67,18 +67,12 @@ export type WithNegatableOperator<Expr> =
   | Expr
 
 export type WithRecordOperator<Schema> = Schema extends NonArrayObject
-  ?
-      | {
-          readonly [Property in keyof WithId<Schema>]?: WithOperator<
-            Schema[Property]
-          >
-        }
-      | {
-          readonly [Property in FlattenFilterPaths<Schema>]?: FilterType<
-            Schema,
-            Property
-          >
-        }
+  ? {
+      readonly [Property in FlattenFilterPaths<WithId<Schema>>]?: FilterType<
+        Schema,
+        Property
+      >
+    }
   : {}
 
 export type WithOperator<Field> =
