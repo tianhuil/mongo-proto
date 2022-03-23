@@ -2,6 +2,7 @@ import {
   BulkWriteOptions,
   Callback,
   CountDocumentsOptions,
+  CreateIndexesOptions,
   DeleteOptions,
   DeleteResult,
   DistinctOptions,
@@ -27,6 +28,7 @@ import {
   TsFindOneAndUpdateOptions,
   TsFindOptions,
 } from './find'
+import { IndexSpecification } from './mongo-index'
 import { Update } from './update'
 
 export declare class SafeCollection<TSchema extends Document> {
@@ -259,157 +261,95 @@ export declare class SafeCollection<TSchema extends Document> {
   options(callback: Callback<Document>): void
   options(options: OperationOptions): Promise<Document>
   options(options: OperationOptions, callback: Callback<Document>): void
-  // /**
-  //  * Creates an index on the db and collection collection.
-  //  *
-  //  * @param indexSpec - The field name or index specification to create an index for
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  *
-  //  * @example
-  //  * ```js
-  //  * const collection = client.db('foo').collection('bar');
-  //  *
-  //  * await collection.createIndex({ a: 1, b: -1 });
-  //  *
-  //  * // Alternate syntax for { c: 1, d: -1 } that ensures order of indexes
-  //  * await collection.createIndex([ [c, 1], [d, -1] ]);
-  //  *
-  //  * // Equivalent to { e: 1 }
-  //  * await collection.createIndex('e');
-  //  *
-  //  * // Equivalent to { f: 1, g: 1 }
-  //  * await collection.createIndex(['f', 'g'])
-  //  *
-  //  * // Equivalent to { h: 1, i: -1 }
-  //  * await collection.createIndex([ { h: 1 }, { i: -1 } ]);
-  //  *
-  //  * // Equivalent to { j: 1, k: -1, l: 2d }
-  //  * await collection.createIndex(['j', ['k', -1], { l: '2d' }])
-  //  * ```
-  //  */
-  // createIndex(indexSpec: IndexSpecification<TSchema>): Promise<string>
-  // createIndex(
-  //   indexSpec: IndexSpecification<TSchema>,
-  //   callback: Callback<string>
-  // ): void
-  // createIndex(
-  //   indexSpec: IndexSpecification<TSchema>,
-  //   options: CreateIndexesOptions
-  // ): Promise<string>
-  // createIndex(
-  //   indexSpec: IndexSpecification<TSchema>,
-  //   options: CreateIndexesOptions,
-  //   callback: Callback<string>
-  // ): void
-  // /**
-  //  * Creates multiple indexes in the collection, this method is only supported for
-  //  * MongoDB 2.6 or higher. Earlier version of MongoDB will throw a command not supported
-  //  * error.
-  //  *
-  //  * **Note**: Unlike {@link Collection#createIndex| createIndex}, this function takes in raw index specifications.
-  //  * Index specifications are defined {@link http://docs.mongodb.org/manual/reference/command/createIndexes/| here}.
-  //  *
-  //  * @param indexSpecs - An array of index specifications to be created
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  *
-  //  * @example
-  //  * ```js
-  //  * const collection = client.db('foo').collection('bar');
-  //  * await collection.createIndexes([
-  //  *   // Simple index on field fizz
-  //  *   {
-  //  *     key: { fizz: 1 },
-  //  *   }
-  //  *   // wildcard index
-  //  *   {
-  //  *     key: { '$**': 1 }
-  //  *   },
-  //  *   // named index on darmok and jalad
-  //  *   {
-  //  *     key: { darmok: 1, jalad: -1 }
-  //  *     name: 'tanagra'
-  //  *   }
-  //  * ]);
-  //  * ```
-  //  */
-  // createIndexes(indexSpecs: IndexDescription[]): Promise<string[]>
-  // createIndexes(
-  //   indexSpecs: IndexDescription[],
-  //   callback: Callback<string[]>
-  // ): void
-  // createIndexes(
-  //   indexSpecs: IndexDescription[],
-  //   options: CreateIndexesOptions
-  // ): Promise<string[]>
-  // createIndexes(
-  //   indexSpecs: IndexDescription[],
-  //   options: CreateIndexesOptions,
-  //   callback: Callback<string[]>
-  // ): void
-  // /**
-  //  * Drops an index from this collection.
-  //  *
-  //  * @param indexName - Name of the index to drop.
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  */
-  // dropIndex(indexName: string): Promise<Document>
-  // dropIndex(indexName: string, callback: Callback<Document>): void
-  // dropIndex(indexName: string, options: DropIndexesOptions): Promise<Document>
-  // dropIndex(
-  //   indexName: string,
-  //   options: DropIndexesOptions,
-  //   callback: Callback<Document>
-  // ): void
-  // /**
-  //  * Drops all indexes from this collection.
-  //  *
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  */
-  // dropIndexes(): Promise<Document>
-  // dropIndexes(callback: Callback<Document>): void
-  // dropIndexes(options: DropIndexesOptions): Promise<Document>
-  // dropIndexes(options: DropIndexesOptions, callback: Callback<Document>): void
-  // /**
-  //  * Get the list of all indexes information for the collection.
-  //  *
-  //  * @param options - Optional settings for the command
-  //  */
-  // listIndexes(options?: ListIndexesOptions): ListIndexesCursor
-  // /**
-  //  * Checks if one or more indexes exist on the collection, fails on first non-existing index
-  //  *
-  //  * @param indexes - One or more index names to check.
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  */
-  // indexExists(indexes: string | string[]): Promise<boolean>
-  // indexExists(indexes: string | string[], callback: Callback<boolean>): void
-  // indexExists(
-  //   indexes: string | string[],
-  //   options: IndexInformationOptions
-  // ): Promise<boolean>
-  // indexExists(
-  //   indexes: string | string[],
-  //   options: IndexInformationOptions,
-  //   callback: Callback<boolean>
-  // ): void
-  // /**
-  //  * Retrieves this collections index info.
-  //  *
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  */
-  // indexInformation(): Promise<Document>
-  // indexInformation(callback: Callback<Document>): void
-  // indexInformation(options: IndexInformationOptions): Promise<Document>
-  // indexInformation(
-  //   options: IndexInformationOptions,
-  //   callback: Callback<Document>
-  // ): void
+  /**
+   * Creates an index on the db and collection collection.
+   *
+   * @param indexSpec - The field name or index specification to create an index for
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   *
+   * @example
+   * ```js
+   * const collection = client.db('foo').collection('bar');
+   *
+   * await collection.createIndex({ a: 1, b: -1 });
+   *
+   * // Alternate syntax for { c: 1, d: -1 } that ensures order of indexes
+   * await collection.createIndex([ [c, 1], [d, -1] ]);
+   *
+   * // Equivalent to { e: 1 }
+   * await collection.createIndex('e');
+   *
+   * // Equivalent to { f: 1, g: 1 }
+   * await collection.createIndex(['f', 'g'])
+   *
+   * // Equivalent to { h: 1, i: -1 }
+   * await collection.createIndex([ { h: 1 }, { i: -1 } ]);
+   *
+   * // Equivalent to { j: 1, k: -1, l: 2d }
+   * await collection.createIndex(['j', ['k', -1], { l: '2d' }])
+   * ```
+   */
+  createIndex(indexSpec: IndexSpecification<TSchema>): Promise<string>
+  createIndex(
+    indexSpec: IndexSpecification<TSchema>,
+    callback: Callback<string>
+  ): void
+  createIndex(
+    indexSpec: IndexSpecification<TSchema>,
+    options: CreateIndexesOptions
+  ): Promise<string>
+  createIndex(
+    indexSpec: IndexSpecification<TSchema>,
+    options: CreateIndexesOptions,
+    callback: Callback<string>
+  ): void
+  /**
+   * Creates multiple indexes in the collection, this method is only supported for
+   * MongoDB 2.6 or higher. Earlier version of MongoDB will throw a command not supported
+   * error.
+   *
+   * **Note**: Unlike {@link Collection#createIndex| createIndex}, this function takes in raw index specifications.
+   * Index specifications are defined {@link http://docs.mongodb.org/manual/reference/command/createIndexes/| here}.
+   *
+   * @param indexSpecs - An array of index specifications to be created
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   *
+   * @example
+   * ```js
+   * const collection = client.db('foo').collection('bar');
+   * await collection.createIndexes([
+   *   // Simple index on field fizz
+   *   {
+   *     key: { fizz: 1 },
+   *   }
+   *   // wildcard index
+   *   {
+   *     key: { '$**': 1 }
+   *   },
+   *   // named index on darmok and jalad
+   *   {
+   *     key: { darmok: 1, jalad: -1 }
+   *     name: 'tanagra'
+   *   }
+   * ]);
+   * ```
+   */
+  createIndexes(indexSpecs: IndexSpecification<TSchema>[]): Promise<string[]>
+  createIndexes(
+    indexSpecs: IndexSpecification<TSchema>[],
+    callback: Callback<string[]>
+  ): void
+  createIndexes(
+    indexSpecs: IndexSpecification<TSchema>[],
+    options: CreateIndexesOptions
+  ): Promise<string[]>
+  createIndexes(
+    indexSpecs: IndexSpecification<TSchema>[],
+    options: CreateIndexesOptions,
+    callback: Callback<string[]>
+  ): void
   /**
    * Gets the number of documents matching the filter.
    * For a fast count of the total documents in a collection see {@link Collection#estimatedDocumentCount| estimatedDocumentCount}.
