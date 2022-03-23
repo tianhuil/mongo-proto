@@ -1,5 +1,6 @@
 export * from './collection'
 export * from './filter'
-export * from './project'
+export * from './projection'
 export * from './sort'
 export * from './update'
+export * from './util'

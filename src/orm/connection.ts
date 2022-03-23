@@ -1,11 +1,10 @@
 import { Collection, CollectionOptions, Db, Document } from 'mongodb'
-import { SafeCollection } from './types'
+import { RemodelType, SafeCollection } from './types'
 
-export declare interface TsCollection<TSchema extends Document>
-  extends SafeCollection<TSchema>,
-    Omit<Collection<TSchema>, keyof SafeCollection<TSchema>> {
-  unsafe: Collection<TSchema>
-}
+export declare type TsCollection<TSchema extends Document> = RemodelType<
+  SafeCollection<TSchema> & { unsafe: Collection<TSchema> },
+  Collection<TSchema>
+>
 
 /**
  *

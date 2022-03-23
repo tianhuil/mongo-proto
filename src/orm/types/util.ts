@@ -46,3 +46,6 @@ export declare type InferIdType<TSchema> = TSchema extends {
     ? ObjectId
     : IdType
   : ObjectId
+
+export declare type RemodelType<NewType, OldType> = NewType &
+  Omit<OldType, keyof NewType>

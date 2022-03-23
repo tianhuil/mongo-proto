@@ -6,11 +6,6 @@ import {
   DeleteResult,
   DistinctOptions,
   Document,
-  FindCursor,
-  FindOneAndDeleteOptions,
-  FindOneAndReplaceOptions,
-  FindOneAndUpdateOptions,
-  FindOptions,
   Flatten,
   InsertManyResult,
   InsertOneOptions,
@@ -25,6 +20,13 @@ import {
   WithoutId,
 } from 'mongodb'
 import { Filter } from './filter'
+import {
+  TsFindCursor,
+  TsFindOneAndDeleteOptions,
+  TsFindOneAndReplaceOptions,
+  TsFindOneAndUpdateOptions,
+  TsFindOptions,
+} from './find'
 import { Update } from './update'
 
 export declare class SafeCollection<TSchema extends Document> {
@@ -214,11 +216,11 @@ export declare class SafeCollection<TSchema extends Document> {
   ): void
   findOne(
     filter: Filter<TSchema>,
-    options: FindOptions
+    options: TsFindOptions<TSchema>
   ): Promise<WithId<TSchema> | null>
   findOne(
     filter: Filter<TSchema>,
-    options: FindOptions,
+    options: TsFindOptions<TSchema>,
     callback: Callback<WithId<TSchema> | null>
   ): void
   findOne<T = TSchema>(): Promise<T | null>
@@ -226,11 +228,11 @@ export declare class SafeCollection<TSchema extends Document> {
   findOne<T = TSchema>(filter: Filter<TSchema>): Promise<T | null>
   findOne<T = TSchema>(
     filter: Filter<TSchema>,
-    options?: FindOptions
+    options?: TsFindOptions<TSchema>
   ): Promise<T | null>
   findOne<T = TSchema>(
     filter: Filter<TSchema>,
-    options?: FindOptions,
+    options?: TsFindOptions<TSchema>,
     callback?: Callback<T | null>
   ): void
   /**
@@ -238,12 +240,15 @@ export declare class SafeCollection<TSchema extends Document> {
    *
    * @param filter - The filter predicate. If unspecified, then all documents in the collection will match the predicate
    */
-  find(): FindCursor<WithId<TSchema>>
+  find(): TsFindCursor<WithId<TSchema>>
   find(
     filter: Filter<TSchema>,
-    options?: FindOptions
-  ): FindCursor<WithId<TSchema>>
-  find<T>(filter: Filter<TSchema>, options?: FindOptions): FindCursor<T>
+    options?: TsFindOptions<TSchema>
+  ): TsFindCursor<WithId<TSchema>>
+  find<T>(
+    filter: Filter<TSchema>,
+    options?: TsFindOptions<TSchema>
+  ): TsFindCursor<T>
   /**
    * Returns the options of the collection.
    *
@@ -522,7 +527,7 @@ export declare class SafeCollection<TSchema extends Document> {
   findOneAndDelete(filter: Filter<TSchema>): Promise<ModifyResult<TSchema>>
   findOneAndDelete(
     filter: Filter<TSchema>,
-    options: FindOneAndDeleteOptions
+    options: TsFindOneAndDeleteOptions<TSchema>
   ): Promise<ModifyResult<TSchema>>
   findOneAndDelete(
     filter: Filter<TSchema>,
@@ -530,7 +535,7 @@ export declare class SafeCollection<TSchema extends Document> {
   ): void
   findOneAndDelete(
     filter: Filter<TSchema>,
-    options: FindOneAndDeleteOptions,
+    options: TsFindOneAndDeleteOptions<TSchema>,
     callback: Callback<ModifyResult<TSchema>>
   ): void
   /**
@@ -553,12 +558,12 @@ export declare class SafeCollection<TSchema extends Document> {
   findOneAndReplace(
     filter: Filter<TSchema>,
     replacement: WithoutId<TSchema>,
-    options: FindOneAndReplaceOptions
+    options: TsFindOneAndReplaceOptions<TSchema>
   ): Promise<ModifyResult<TSchema>>
   findOneAndReplace(
     filter: Filter<TSchema>,
     replacement: WithoutId<TSchema>,
-    options: FindOneAndReplaceOptions,
+    options: TsFindOneAndReplaceOptions<TSchema>,
     callback: Callback<ModifyResult<TSchema>>
   ): void
   /**
@@ -581,12 +586,12 @@ export declare class SafeCollection<TSchema extends Document> {
   findOneAndUpdate(
     filter: Filter<TSchema>,
     update: Update<TSchema>,
-    options: FindOneAndUpdateOptions
+    options: TsFindOneAndUpdateOptions<TSchema>
   ): Promise<ModifyResult<TSchema>>
   findOneAndUpdate(
     filter: Filter<TSchema>,
     update: Update<TSchema>,
-    options: FindOneAndUpdateOptions,
+    options: TsFindOneAndUpdateOptions<TSchema>,
     callback: Callback<ModifyResult<TSchema>>
   ): void
   // /**
