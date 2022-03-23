@@ -6,6 +6,7 @@ import {
   FlattenUpdatePaths,
   FlattenUpdateType,
 } from './flatten'
+import { Sort } from './sort'
 
 export declare type Update<Schema extends Document> = {
   // General operators
@@ -101,5 +102,5 @@ export declare type ArrayAssignType<T> =
       $each: ReadonlyArray<T>
       $position?: number
       $slice?: number
-      $sort?: null // TODO: add sort
+      $sort?: Sort<T>
     }
