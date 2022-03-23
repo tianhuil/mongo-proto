@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb'
-import { BaseTypes, NonArrayObject } from './common'
+import { BaseTypes, NonArrayObject } from './util'
 
 export declare type FlattenFilterPaths<Type> = Join<
   NestedPaths<WithId<Type>, number>,

@@ -1,5 +1,5 @@
 import * as ta from 'type-assertions'
-import { NonArrayObject, RecurPartial } from './common'
+import { NonArrayObject, RecurPartial } from './util'
 
 // Test RecurPartial
 type Example = {
