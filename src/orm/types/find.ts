@@ -10,7 +10,7 @@ import { Projection } from './projection'
 import { Sort } from './sort'
 import { RemodelType } from './util'
 
-type RemodeledOptions<TSchema> = {
+export declare type RemodeledOptions<TSchema> = {
   sort?: Sort<TSchema>
   projection?: Projection<TSchema>
 }

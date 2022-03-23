@@ -457,16 +457,16 @@ export declare class SafeCollection<TSchema extends Document> {
     options: TsFindOneAndUpdateOptions<TSchema>,
     callback: Callback<ModifyResult<TSchema>>
   ): void
-  // /**
-  //  * Execute an aggregation framework pipeline against the collection, needs MongoDB \>= 2.2
-  //  *
-  //  * @param pipeline - An array of aggregation pipelines to execute
-  //  * @param options - Optional settings for the command
-  //  */
-  // aggregate<T = Document>(
-  //   pipeline?: Document[],
-  //   options?: AggregateOptions
-  // ): AggregationCursor<T>
+  /**
+   * Execute an aggregation framework pipeline against the collection, needs MongoDB \>= 2.2
+   *
+   * @param pipeline - An array of aggregation pipelines to execute
+   * @param options - Optional settings for the command
+   */
+  aggregate<T extends Document>(
+    pipeline?: Document[],
+    options?: AggregateOptions
+  ): TsAggregationCursor<T>
   // /**
   //  * Create a new Change Stream, watching for new changes (insertions, updates, replacements, deletions, and invalidations) in this collection.
   //  *
