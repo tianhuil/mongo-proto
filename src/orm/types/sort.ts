@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'
+import { Document, ObjectId } from 'mongodb'
 import { FilterType } from './filter'
 import { FlattenFilterPaths } from './flatten'
 
@@ -16,7 +16,7 @@ export declare type SortDirection =
   | 'ascending'
   | 'descending'
 
-export declare type Sort<TSchema> = {
+export declare type Sort<TSchema extends Document> = {
   [Property in FlattenFilterPaths<TSchema>]?: FilterType<
     TSchema,
     Property
