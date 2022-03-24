@@ -1,6 +1,6 @@
 import faker from '@faker-js/faker'
 import { ObjectId } from 'mongodb'
-import { randomInt } from '../common'
+import { randomInt } from '../../common'
 import { CreditCard, mkDb, Post, User } from './common'
 
 const maxCreditCards = 5

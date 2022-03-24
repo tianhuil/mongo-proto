@@ -1,6 +1,6 @@
 import { ObjectId, WithId } from 'mongodb'
-import { mkDbFactory } from '../common'
-import { mkTsCollection, TsCollection } from '../ts-mongodb'
+import { mkDbFactory } from '../../common'
+import { mkTsCollection, TsCollection } from '../../ts-mongodb'
 
 export interface Post {
   authorId: ObjectId

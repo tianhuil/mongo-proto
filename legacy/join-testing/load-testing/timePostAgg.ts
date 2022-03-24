@@ -1,5 +1,5 @@
-import { choose } from '../common'
-import { loadTest } from '../timing'
+import { choose } from '../../common'
+import { loadTest } from '../../timing'
 import { fetchAuthorIds, mkDb } from './common'
 
 const maxPostsPerAuthor = 5
