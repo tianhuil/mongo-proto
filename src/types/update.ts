@@ -23,7 +23,7 @@ export declare type Update<Schema extends Document> = {
 
   // Add array operators
   $push?: UpdateFlattenArrayTypes<Schema>
-  $addToSet: UpdateFlattenArrayTypes<Schema> // https://docs.mongodb.com/manual/reference/operator/update/addToSet/
+  $addToSet?: UpdateFlattenArrayTypes<Schema> // https://docs.mongodb.com/manual/reference/operator/update/addToSet/
 
   // Remove array elements
   $pull?: PullTypes<Schema>

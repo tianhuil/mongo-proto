@@ -6,23 +6,11 @@ let client: MongoClient
 
 beforeAll(async () => {
   process.env.JWT_KEY = 'abc'
-  mongo = new MongoMemoryServer({ instance: { port: 9341 } })
+  const port = parseInt(process.env.MONGO_TEST_PORT ?? '')
+  mongo = new MongoMemoryServer({ instance: { port } })
   await mongo.start()
-  const mongoUri = 'mongodb://127.0.0.1:9341/test?retryWrites=true&w=majority'
-  client = new MongoClient(mongoUri)
-
+  client = new MongoClient(process.env.MONGO_TEST_URL ?? '')
   await client.connect()
-})
-
-beforeEach(async () => {
-  const collections = await client.db('test').listCollections()
-  await Promise.all(
-    await collections
-      .map((collection) =>
-        client.db('test').collection(collection.name).deleteMany({})
-      )
-      .toArray()
-  )
 })
 
 afterAll(async () => {
