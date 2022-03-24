@@ -6,7 +6,7 @@ let cached: boolean = false
 
 export const setupDb = async (): Promise<Db> => {
   if (!cached || !client) {
-    client = new MongoClient(process.env.MONGO_TEST_URL ?? '')
+    client = new MongoClient(process.env.MONGO_URL ?? '')
     await client.connect()
     cached = true
   }

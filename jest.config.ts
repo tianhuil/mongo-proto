@@ -3,7 +3,11 @@
  * https://jestjs.io/docs/configuration
  */
 
-export default {
+// Merging technique inspired by https://microeducate.tech/is-it-possible-to-use-jest-with-multiple-presets-at-the-same-time/
+const merge = require('merge')
+const mongoDbPreset = require('@shelf/jest-mongodb/jest-preset')
+
+export default merge(mongoDbPreset, {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -128,7 +132,7 @@ export default {
   setupFiles: ['dotenv/config'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ['./jestSetup.ts'],
+  // setupFilesAfterEnv: [],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,
@@ -187,8 +191,8 @@ export default {
   // verbose: undefined,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
-  // watchPathIgnorePatterns: [],
+  watchPathIgnorePatterns: ['globalConfig'],
 
   // Whether to use watchman for file crawling
   // watchman: true,
-}
+})
