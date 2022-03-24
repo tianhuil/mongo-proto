@@ -1,4 +1,4 @@
-import { Document } from 'mongodb'
+import { Document, Timestamp } from 'mongodb'
 import { WithOperator } from './filter'
 import {
   FlattenFilterPaths,
@@ -17,9 +17,13 @@ export declare type Update<Schema extends Document> = {
   // Comparison operators
   $inc?: UpdateFlattenTypes<Schema, number>
   $mul?: UpdateFlattenTypes<Schema, number>
-  $max?: UpdateFlattenTypes<Schema, number | Date>
-  $min?: UpdateFlattenTypes<Schema, number | Date>
-  $currentDate?: UpdateFlattenTypes<Schema, Date | true>
+  $max?: UpdateFlattenTypes<Schema, number | Date | Timestamp>
+  $min?: UpdateFlattenTypes<Schema, number | Date | Timestamp>
+  $currentDate?: UpdateFlattenTypes<
+    Schema,
+    Date | Timestamp,
+    true | { $type: 'timestamp' | 'date' }
+  >
 
   // Add array operators
   $push?: UpdateFlattenArrayTypes<Schema>
