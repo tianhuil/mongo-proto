@@ -1,5 +1,5 @@
 import * as ta from 'type-assertions'
-import { Doc, NonArrayObject, RecurPartial } from './util'
+import { Doc, NonArrayObject, RecurPartial, _Doc } from './util'
 
 // Test RecurPartial
 type Example = {
@@ -51,9 +51,9 @@ ta.assert<ta.Extends<string, string | number>>()
 ta.assert<ta.Extends<string, unknown>>()
 
 // Test Doc
-ta.assert<ta.Extends<string, Doc>>()
+ta.assert<ta.Extends<string, _Doc>>()
 ta.assert<ta.Extends<{ a: string[]; b: { c: number; d: Date } }, Doc>>()
-ta.assert<ta.Not<ta.Extends<() => void, Doc>>>()
+ta.assert<ta.Not<ta.Extends<() => void, _Doc>>>()
 ta.assert<ta.Not<ta.Extends<{ a: () => void }, Doc>>>()
-ta.assert<ta.Not<ta.Extends<HTMLAreaElement, Doc>>>()
+ta.assert<ta.Not<ta.Extends<HTMLAreaElement, _Doc>>>()
 ta.assert<ta.Not<ta.Extends<{ a: HTMLAreaElement }, Doc>>>()
