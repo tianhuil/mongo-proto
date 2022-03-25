@@ -26,8 +26,9 @@ import {
 } from './find'
 import { IndexSpecification } from './mongo-index'
 import { Update } from './update'
+import { Doc } from './util'
 
-export declare class SafeCollection<TSchema extends Document> {
+export declare class SafeCollection<TSchema extends Doc> {
   /**
    * Update a single document in a collection
    *
@@ -463,7 +464,7 @@ export declare class SafeCollection<TSchema extends Document> {
    * @param pipeline - An array of aggregation pipelines to execute
    * @param options - Optional settings for the command
    */
-  aggregate<T extends Document>(
+  aggregate<T extends Doc>(
     pipeline?: Document[],
     options?: AggregateOptions
   ): TsAggregationCursor<T>
