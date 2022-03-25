@@ -13,6 +13,8 @@ export declare type BaseTypes =
       _bsontype: string
     }
 
+export declare type Doc = BaseTypes | Doc[] | { [x in string]: Doc }
+
 export declare type RecurPartial<T> = T extends BaseTypes
   ? T
   : T extends ReadonlyArray<infer ArrayType>
