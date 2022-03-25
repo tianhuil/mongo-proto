@@ -13,7 +13,8 @@ export declare type BaseTypes =
       _bsontype: string
     }
 
-export declare type Doc = BaseTypes | Doc[] | { [x in string]: Doc }
+export declare type Doc = { [x in string]: _Doc }
+export declare type _Doc = BaseTypes | _Doc[] | { [x in string]: _Doc }
 
 export declare type RecurPartial<T> = T extends BaseTypes
   ? T
