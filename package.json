@@ -8,8 +8,9 @@
     "seed:native": "ts-node -r dotenv/config src/native/seed.ts",
     "script:native": "ts-node -r dotenv/config src/native/index.ts",
     "indices:native": "ts-node -r dotenv/config src/native/indices.ts",
-    "test:dev": "jest --watch",
-    "test": "jest"
+    "assert": ". ./assert.sh",
+    "jest:dev": "jest --watch",
+    "test": ". ./assert.sh && jest"
   },
   "repository": {
     "type": "git",
