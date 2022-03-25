@@ -36,7 +36,10 @@ export declare type Update<TSchema extends Document> = {
 }
 
 // Select for UpdatePaths
-export declare type SelectFlattenUpdatePaths<TSchema, KeepType> = {
+export declare type SelectFlattenUpdatePaths<
+  TSchema extends Document,
+  KeepType
+> = {
   readonly [Property in FlattenUpdatePaths<TSchema>]: FlattenUpdateType<
     TSchema,
     Property
@@ -61,7 +64,10 @@ export declare type UpdateFlattenTypes<
 }
 
 // Update Array types using Filter dot notation
-export declare type SelectFlattenFilterPaths<TSchema, KeepType> = {
+export declare type SelectFlattenFilterPaths<
+  TSchema extends Document,
+  KeepType
+> = {
   readonly [Property in FlattenFilterPaths<TSchema>]: FlattenFilterType<
     TSchema,
     Property
@@ -70,7 +76,7 @@ export declare type SelectFlattenFilterPaths<TSchema, KeepType> = {
     : never
 }[FlattenFilterPaths<TSchema>]
 
-export declare type PullTypes<TSchema> = {
+export declare type PullTypes<TSchema extends Document> = {
   readonly [Property in SelectFlattenFilterPaths<
     TSchema,
     Array<unknown>
@@ -79,7 +85,7 @@ export declare type PullTypes<TSchema> = {
     : never
 }
 
-export declare type PullAllTypes<TSchema> = {
+export declare type PullAllTypes<TSchema extends Document> = {
   readonly [Property in SelectFlattenFilterPaths<
     TSchema,
     Array<unknown>
@@ -89,7 +95,10 @@ export declare type PullAllTypes<TSchema> = {
 }
 
 // Update Array types using Update dot notation
-export declare type UpdateFlattenArrayTypes<TSchema, AssignType = unknown> = {
+export declare type UpdateFlattenArrayTypes<
+  TSchema extends Document,
+  AssignType = unknown
+> = {
   readonly [Property in SelectFlattenUpdatePaths<
     TSchema,
     Array<unknown>

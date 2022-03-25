@@ -104,9 +104,10 @@ export type WithLogicalOperators<Field> =
  * The type for a given dot path into a json object
  * NB: must be maintained as a separate type function
  */
-export declare type FilterType<TSchema, Property extends string> = WithOperator<
-  FlattenFilterType<TSchema, Property>
->
+export declare type FilterType<
+  TSchema extends Document,
+  Property extends string
+> = WithOperator<FlattenFilterType<TSchema, Property>>
 
 export type Filter<
   TSchema extends Document,

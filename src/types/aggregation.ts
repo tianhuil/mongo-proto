@@ -1,4 +1,4 @@
-import { AggregationCursor } from 'mongodb'
+import { AggregationCursor, Document } from 'mongodb'
 import { Filter } from './filter'
 import { RemodeledOptions } from './find'
 import { FlattenFilterPaths } from './flatten'
@@ -28,7 +28,7 @@ export declare type Lookup<
   as: string
 }
 
-export declare type TsAggregationCursor<TSchema> = RemodelType<
+export declare type TsAggregationCursor<TSchema extends Document> = RemodelType<
   RemodeledOptions<TSchema>,
   AggregationCursor<TSchema>
 >
