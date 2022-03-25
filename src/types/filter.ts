@@ -67,14 +67,14 @@ export type WithNegatableOperator<Expr> =
   | Expr
 
 export type WithRecordOperator<
-  Schema,
+  TSchema,
   IndexType extends number = 0
-> = Schema extends NonArrayObject
+> = TSchema extends NonArrayObject
   ? {
       readonly [Property in FlattenFilterPaths<
-        WithId<Schema>,
+        WithId<TSchema>,
         IndexType
-      >]?: FilterType<Schema, Property>
+      >]?: FilterType<TSchema, Property>
     }
   : {}
 
@@ -104,11 +104,11 @@ export type WithLogicalOperators<Field> =
  * The type for a given dot path into a json object
  * NB: must be maintained as a separate type function
  */
-export declare type FilterType<Schema, Property extends string> = WithOperator<
-  FlattenFilterType<Schema, Property>
+export declare type FilterType<TSchema, Property extends string> = WithOperator<
+  FlattenFilterType<TSchema, Property>
 >
 
 export type Filter<
-  Schema extends Document,
+  TSchema extends Document,
   IndexType extends number = 0
-> = WithLogicalOperators<WithOperator<Schema, IndexType>>
+> = WithLogicalOperators<WithOperator<TSchema, IndexType>>

@@ -8,31 +8,31 @@ import {
 } from './flatten'
 import { Sort } from './sort'
 
-export declare type Update<Schema extends Document> = {
+export declare type Update<TSchema extends Document> = {
   // General operators
-  $set?: UpdateFlattenTypes<Schema, unknown>
-  $setOnInsert?: UpdateFlattenTypes<Schema, unknown>
-  $unset?: UpdateFlattenTypes<Schema, unknown, '' | true | 1>
+  $set?: UpdateFlattenTypes<TSchema, unknown>
+  $setOnInsert?: UpdateFlattenTypes<TSchema, unknown>
+  $unset?: UpdateFlattenTypes<TSchema, unknown, '' | true | 1>
 
   // Comparison operators
-  $inc?: UpdateFlattenTypes<Schema, number>
-  $mul?: UpdateFlattenTypes<Schema, number>
-  $max?: UpdateFlattenTypes<Schema, number | Date | Timestamp>
-  $min?: UpdateFlattenTypes<Schema, number | Date | Timestamp>
+  $inc?: UpdateFlattenTypes<TSchema, number>
+  $mul?: UpdateFlattenTypes<TSchema, number>
+  $max?: UpdateFlattenTypes<TSchema, number | Date | Timestamp>
+  $min?: UpdateFlattenTypes<TSchema, number | Date | Timestamp>
   $currentDate?: UpdateFlattenTypes<
-    Schema,
+    TSchema,
     Date | Timestamp,
     true | { $type: 'timestamp' | 'date' }
   >
 
   // Add array operators
-  $push?: UpdateFlattenArrayTypes<Schema>
-  $addToSet?: UpdateFlattenArrayTypes<Schema> // https://docs.mongodb.com/manual/reference/operator/update/addToSet/
+  $push?: UpdateFlattenArrayTypes<TSchema>
+  $addToSet?: UpdateFlattenArrayTypes<TSchema> // https://docs.mongodb.com/manual/reference/operator/update/addToSet/
 
   // Remove array elements
-  $pull?: PullTypes<Schema>
-  $pullAll?: PullAllTypes<Schema>
-  $pop?: UpdateFlattenArrayTypes<Schema, -1 | 1>
+  $pull?: PullTypes<TSchema>
+  $pullAll?: PullAllTypes<TSchema>
+  $pop?: UpdateFlattenArrayTypes<TSchema, -1 | 1>
 }
 
 // Select for UpdatePaths

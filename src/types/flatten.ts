@@ -16,14 +16,14 @@ export declare type FlattenUpdatePaths<Type> = Join<
 >
 
 export declare type FlattenFilterType<
-  Schema,
+  TSchema,
   Property extends string
-> = _FlattenFilterType<WithId<Schema>, Property, `${number}`>
+> = _FlattenFilterType<WithId<TSchema>, Property, `${number}`>
 
 export declare type FlattenUpdateType<
-  Schema,
+  TSchema,
   Property extends string
-> = _FlattenFilterType<WithId<Schema>, Property, UpdateArrayHolder>
+> = _FlattenFilterType<WithId<TSchema>, Property, UpdateArrayHolder>
 
 declare type Join<T extends unknown[], D extends string> = T extends []
   ? ''
@@ -56,30 +56,30 @@ declare type NestedPaths<Type, ArrayIndexType> = Type extends BaseTypes
   : []
 
 declare type _FlattenFilterType<
-  Schema,
+  TSchema,
   Property extends string,
   ArrayHolder extends string
 > = string extends Property
   ? never
-  : Schema extends BaseTypes
-  ? Schema
-  : Property extends keyof Schema // Simple key
-  ? Schema extends NonArrayObject
-    ? Schema[Property]
+  : TSchema extends BaseTypes
+  ? TSchema
+  : Property extends keyof TSchema // Simple key
+  ? TSchema extends NonArrayObject
+    ? TSchema[Property]
     : never
   : Property extends ArrayHolder
-  ? Schema extends ReadonlyArray<infer ArrayType>
+  ? TSchema extends ReadonlyArray<infer ArrayType>
     ? ArrayType
     : never
   : Property extends `${infer Key}.${infer Rest}` // Compound key
   ? Key extends ArrayHolder
-    ? Schema extends ReadonlyArray<infer ArrayType>
+    ? TSchema extends ReadonlyArray<infer ArrayType>
       ? _FlattenFilterType<ArrayType, Rest, ArrayHolder>
       : never
-    : Key extends keyof Schema
-    ? _FlattenFilterType<Schema[Key], Rest, ArrayHolder>
+    : Key extends keyof TSchema
+    ? _FlattenFilterType<TSchema[Key], Rest, ArrayHolder>
     : never
-  : Schema extends ReadonlyArray<infer ArrayType> // Can omit index for array of objects
+  : TSchema extends ReadonlyArray<infer ArrayType> // Can omit index for array of objects
   ? ArrayType extends NonArrayObject
     ? _FlattenFilterType<ArrayType, Property, ArrayHolder>
     : never

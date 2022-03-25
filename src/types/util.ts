@@ -27,7 +27,7 @@ export declare type RecurPartial<T> = T extends BaseTypes
 
 /**
  * Array extends Document so need a document that does not match an Array
- * However, must also extend Document for `Schema[Property]` to be valid
+ * However, must also extend Document for `TSchema[Property]` to be valid
  */
 export declare type NonArrayObject = {
   readonly [x: string]: unknown
