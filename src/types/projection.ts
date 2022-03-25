@@ -1,3 +1,4 @@
+import { Document } from 'mongodb'
 import { WithOperator } from './filter'
 import { FlattenFilterPaths, FlattenFilterType } from './flatten'
 
@@ -10,7 +11,7 @@ export declare type ProjectionOperator<Field> = Field extends ReadonlyArray<
     }
   : never
 
-export declare type Projection<TSchema> =
+export declare type Projection<TSchema extends Document> =
   | {
       [Property in FlattenFilterPaths<TSchema>]?: Property extends '_id'
         ? 1 | 0 | boolean
