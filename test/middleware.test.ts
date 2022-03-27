@@ -8,7 +8,7 @@ const mkListeningCollection = async () => {
 
   const [before, after] = [jest.fn(), jest.fn()]
   addMiddleware(col, {
-    generalHandler:
+    handler:
       ({ originalMethod }) =>
       (...args) => {
         before()

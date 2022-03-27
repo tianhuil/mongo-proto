@@ -61,39 +61,25 @@ export const isMiddlewareMethod = (
   return middlewareMethods.includes(methodName as MiddlewareMethods)
 }
 
-export interface Context<
-  TSchema,
-  Property extends MethodKeys<TsCollection<TSchema>>
-> {
+export interface Context {
   originalMethod: (...args: any[]) => any
-  methodName: Property
+  methodName: MiddlewareMethods
 }
 
-export type Handler<
-  TSchema extends Document,
-  Property extends MiddlewareMethods
-> = (ctx: Context<TSchema, Property>) => TsCollection<TSchema>[Property]
+export type Handler = (ctx: Context) => (...args: unknown[]) => any
 
-export type Handlers<TSchema extends Document> = {
-  [Property in MiddlewareMethods]?: Handler<TSchema, Property>
-}
-
-export type GeneralHandler<TSchema extends Document> = (
-  ctx: Context<TSchema, MiddlewareMethods>
-) => (...args: unknown[]) => any
-
-type Middleware<TSchema extends Document> = {
-  generalHandler?: GeneralHandler<TSchema>
+type Middleware = {
+  handler?: Handler
 }
 
 export const addMiddleware = <TSchema extends Document>(
   collection: TsCollection<TSchema>,
-  { generalHandler }: Middleware<TSchema> = {}
+  { handler }: Middleware = {}
 ) => {
-  if (generalHandler) {
+  if (handler) {
     middlewareMethods.forEach((methodName) => {
       Object.defineProperty(collection, methodName, {
-        value: generalHandler({
+        value: handler({
           originalMethod: collection[methodName].bind(collection),
           methodName,
         }).bind(collection),
