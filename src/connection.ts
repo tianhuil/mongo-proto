@@ -31,11 +31,23 @@ export const mkTsCollection = <TSchema extends Document>(
   db: Db,
   name: string,
   options?: TsCollectionOptions<TSchema, MiddlewareMethods>
-) =>
+) => collectionProxy<TSchema>(db, name, true, options) as TsCollection<TSchema>
+
+const collectionProxy = <TSchema extends Document>(
+  db: Db,
+  name: string,
+  withUnsafe: boolean,
+  options?: TsCollectionOptions<TSchema, MiddlewareMethods>
+): Collection<TSchema> | TsCollection<TSchema> =>
   new Proxy(db.collection<TSchema>(name, options), {
     get(target, property: string) {
-      if (property === 'unsafe') {
-        return target
+      if (withUnsafe && property === 'unsafe') {
+        return collectionProxy<TSchema>(
+          db,
+          name,
+          false,
+          options
+        ) as Collection<TSchema>
       }
 
       const handler = options?.handler
