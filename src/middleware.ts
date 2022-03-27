@@ -63,22 +63,43 @@ export const isMiddlewareMethod = (
 
 export interface Context<
   TSchema,
-  Key extends MethodKeys<TsCollection<TSchema>>
+  Property extends MethodKeys<TsCollection<TSchema>>
 > {
-  originalMethod: TsCollection<TSchema>[Key]
+  originalMethod: (...args: any[]) => any
+  methodName: Property
 }
 
 export type Handler<
   TSchema extends Document,
-  // NB: need MethodKeys<TsCollection<TSchema>> because typescript is not smart enough to infer from just MiddlewareMethods
-  K extends MethodKeys<TsCollection<TSchema>>
-> = (ctx: Context<TSchema, K>) => TsCollection<TSchema>[K]
+  Property extends MiddlewareMethods
+> = (ctx: Context<TSchema, Property>) => TsCollection<TSchema>[Property]
 
 export type Handlers<TSchema extends Document> = {
-  [K in MethodKeys<TsCollection<TSchema>>]: Handler<TSchema, K>
+  [Property in MiddlewareMethods]?: Handler<TSchema, Property>
 }
 
-export type Middleware<
-  TSchema extends Document,
-  K extends MethodKeys<TsCollection<TSchema>>
-> = Handlers<TSchema>[K]
+export type GeneralHandler<TSchema extends Document> = (
+  ctx: Context<TSchema, MiddlewareMethods>
+) => (...args: unknown[]) => any
+
+type Middleware<TSchema extends Document> = {
+  generalHandler?: GeneralHandler<TSchema>
+}
+
+export const addMiddleware = <TSchema extends Document>(
+  collection: TsCollection<TSchema>,
+  { generalHandler }: Middleware<TSchema> = {}
+) => {
+  if (generalHandler) {
+    middlewareMethods.forEach((methodName) => {
+      Object.defineProperty(collection, methodName, {
+        value: generalHandler({
+          originalMethod: collection[methodName].bind(collection),
+          methodName,
+        }).bind(collection),
+        configurable: true,
+        writable: false,
+      })
+    })
+  }
+}
