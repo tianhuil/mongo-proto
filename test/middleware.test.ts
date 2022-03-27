@@ -11,9 +11,9 @@ const mkListeningCollection = async () => {
     handler:
       ({ originalMethod }) =>
       (...args) => {
-        before()
+        before(args)
         const result = originalMethod(...args)
-        after()
+        after(result)
         return result
       },
   })
@@ -23,9 +23,10 @@ const mkListeningCollection = async () => {
 
 test('test listening on insertOne', async () => {
   const { col, before, after } = await mkListeningCollection()
+  const { insertedId } = await col.insertOne({ a: 2 })
 
-  await col.insertOne({ a: 2 })
   expect(before).toHaveBeenCalledTimes(1)
+  expect(before).toHaveBeenCalledWith([{ a: 2, _id: insertedId }])
   expect(after).toHaveBeenCalledTimes(1)
 })
 
@@ -35,5 +36,6 @@ test('test listening on find', async () => {
   for await (const x of col.find({})) {
   }
   expect(before).toHaveBeenCalledTimes(1)
+  expect(before).toHaveBeenCalledWith([{}])
   expect(after).toHaveBeenCalledTimes(1)
 })
