@@ -15,8 +15,6 @@ test('test unset on dot notation', async () => {
 
   const result3 = await col.findOne({ _id: id })
   expect(result3).toStrictEqual({ _id: id, a: { b: 2 }, d: 5 })
-
-  return col.deleteMany({})
 })
 
 test('test unset of object', async () => {
@@ -26,8 +24,6 @@ test('test unset of object', async () => {
 
   const result3 = await col.findOne({ _id: id })
   expect(result3).toStrictEqual({ _id: id, d: 5 })
-
-  return col.deleteMany({})
 })
 
 test('test unset other key', async () => {
@@ -37,6 +33,4 @@ test('test unset other key', async () => {
 
   const result3 = await col.findOne({ _id: id })
   expect(result3).toStrictEqual({ _id: id, a: { b: 2, c: 'hi' } })
-
-  return col.deleteMany({})
 })
