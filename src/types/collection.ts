@@ -1,18 +1,40 @@
 import {
   AggregateOptions,
-  Callback,
+  AnyBulkWriteOperation,
+  BulkWriteOptions,
+  BulkWriteResult,
+  ChangeStream,
+  ChangeStreamOptions,
+  Collection,
+  CollStats,
+  CollStatsOptions,
   CountDocumentsOptions,
+  CountOptions,
   CreateIndexesOptions,
   DeleteOptions,
   DeleteResult,
   DistinctOptions,
   Document,
-  Flatten,
+  DropCollectionOptions,
+  DropIndexesOptions,
+  EstimatedDocumentCountOptions,
+  IndexInformationOptions,
+  InsertManyResult,
+  InsertOneOptions,
+  InsertOneResult,
+  ListIndexesCursor,
+  ListIndexesOptions,
+  MapFunction,
+  MapReduceOptions,
   ModifyResult,
+  OptionalUnlessRequiredId,
+  OrderedBulkOperation,
+  ReduceFunction,
+  RenameOptions,
   ReplaceOptions,
+  UnorderedBulkOperation,
   UpdateOptions,
   UpdateResult,
-  WithId,
   WithoutId,
 } from 'mongodb'
 import { TsAggregationCursor } from './aggregation'
@@ -30,6 +52,67 @@ import { Doc } from './util'
 
 export declare class SafeCollection<TSchema extends Doc> {
   /**
+   * Inserts a single document into MongoDB. If documents passed in do not contain the **_id** field,
+   * one will be added to each of the documents missing it by the driver, mutating the document. This behavior
+   * can be overridden by setting the **forceServerObjectId** flag.
+   *
+   * @param doc - The document to insert
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  insertOne(
+    doc: OptionalUnlessRequiredId<TSchema>,
+    options?: InsertOneOptions
+  ): Promise<InsertOneResult<TSchema>>
+  /**
+   * Inserts an array of documents into MongoDB. If documents passed in do not contain the **_id** field,
+   * one will be added to each of the documents missing it by the driver, mutating the document. This behavior
+   * can be overridden by setting the **forceServerObjectId** flag.
+   *
+   * @param docs - The documents to insert
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  insertMany(
+    docs: OptionalUnlessRequiredId<TSchema>[],
+    options?: BulkWriteOptions
+  ): Promise<InsertManyResult<TSchema>>
+  /**
+   * Perform a bulkWrite operation without a fluent API
+   *
+   * Legal operation types are
+   *
+   * ```js
+   *  { insertOne: { document: { a: 1 } } }
+   *
+   *  { updateOne: { filter: {a:2}, update: {$set: {a:2}}, upsert:true } }
+   *
+   *  { updateMany: { filter: {a:2}, update: {$set: {a:2}}, upsert:true } }
+   *
+   *  { updateMany: { filter: {}, update: {$set: {"a.$[i].x": 5}}, arrayFilters: [{ "i.x": 5 }]} }
+   *
+   *  { deleteOne: { filter: {c:1} } }
+   *
+   *  { deleteMany: { filter: {c:1} } }
+   *
+   *  { replaceOne: { filter: {c:3}, replacement: {c:4}, upsert:true} }
+   *```
+   * Please note that raw operations are no longer accepted as of driver version 4.0.
+   *
+   * If documents passed in do not contain the **_id** field,
+   * one will be added to each of the documents missing it by the driver, mutating the document. This behavior
+   * can be overridden by setting the **forceServerObjectId** flag.
+   *
+   * @param operations - Bulk operations to perform
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   * @throws MongoDriverError if operations is not an array
+   */
+  bulkWrite(
+    operations: AnyBulkWriteOperation<TSchema>[],
+    options?: BulkWriteOptions
+  ): Promise<BulkWriteResult>
+  /**
    * Update a single document in a collection
    *
    * @param filter - The filter used to select the document to update
@@ -39,24 +122,9 @@ export declare class SafeCollection<TSchema extends Doc> {
    */
   updateOne(
     filter: Filter<TSchema>,
-    update: Update<TSchema>
+    update: Update<TSchema>,
+    options?: UpdateOptions
   ): Promise<UpdateResult>
-  updateOne(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    callback: Callback<UpdateResult>
-  ): void
-  updateOne(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    options: UpdateOptions
-  ): Promise<UpdateResult>
-  updateOne(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    options: UpdateOptions,
-    callback: Callback<UpdateResult>
-  ): void
   /**
    * Replace a document in a collection with another document
    *
@@ -67,24 +135,9 @@ export declare class SafeCollection<TSchema extends Doc> {
    */
   replaceOne(
     filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>
+    replacement: WithoutId<TSchema>,
+    options?: ReplaceOptions
   ): Promise<UpdateResult | Document>
-  replaceOne(
-    filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>,
-    callback: Callback<UpdateResult | Document>
-  ): void
-  replaceOne(
-    filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>,
-    options: ReplaceOptions
-  ): Promise<UpdateResult | Document>
-  replaceOne(
-    filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>,
-    options: ReplaceOptions,
-    callback: Callback<UpdateResult | Document>
-  ): void
   /**
    * Update multiple documents in a collection
    *
@@ -95,24 +148,9 @@ export declare class SafeCollection<TSchema extends Doc> {
    */
   updateMany(
     filter: Filter<TSchema>,
-    update: Update<TSchema>
+    update: Update<TSchema>,
+    options?: UpdateOptions
   ): Promise<UpdateResult | Document>
-  updateMany(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    callback: Callback<UpdateResult | Document>
-  ): void
-  updateMany(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    options: UpdateOptions
-  ): Promise<UpdateResult | Document>
-  updateMany(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    options: UpdateOptions,
-    callback: Callback<UpdateResult | Document>
-  ): void
   /**
    * Delete a document from a collection
    *
@@ -120,17 +158,10 @@ export declare class SafeCollection<TSchema extends Doc> {
    * @param options - Optional settings for the command
    * @param callback - An optional callback, a Promise will be returned if none is provided
    */
-  deleteOne(filter: Filter<TSchema>): Promise<DeleteResult>
-  deleteOne(filter: Filter<TSchema>, callback: Callback<DeleteResult>): void
   deleteOne(
     filter: Filter<TSchema>,
-    options: DeleteOptions
+    options?: DeleteOptions
   ): Promise<DeleteResult>
-  deleteOne(
-    filter: Filter<TSchema>,
-    options: DeleteOptions,
-    callback?: Callback<DeleteResult>
-  ): void
   /**
    * Delete multiple documents from a collection
    *
@@ -138,17 +169,28 @@ export declare class SafeCollection<TSchema extends Doc> {
    * @param options - Optional settings for the command
    * @param callback - An optional callback, a Promise will be returned if none is provided
    */
-  deleteMany(filter: Filter<TSchema>): Promise<DeleteResult>
-  deleteMany(filter: Filter<TSchema>, callback: Callback<DeleteResult>): void
   deleteMany(
     filter: Filter<TSchema>,
-    options: DeleteOptions
+    options?: DeleteOptions
   ): Promise<DeleteResult>
-  deleteMany(
-    filter: Filter<TSchema>,
-    options: DeleteOptions,
-    callback: Callback<DeleteResult>
-  ): void
+  /**
+   * Rename the collection.
+   *
+   * @remarks
+   * This operation does not inherit options from the Db or MongoClient.
+   *
+   * @param newName - New name of of the collection.
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  rename(newName: string, options?: RenameOptions): Promise<Collection>
+  /**
+   * Drop the collection from the database, removing it permanently. New accesses will create a new collection.
+   *
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  drop(options?: DropCollectionOptions): Promise<boolean>
   /**
    * Fetches the first document that matches the filter
    *
@@ -156,45 +198,16 @@ export declare class SafeCollection<TSchema extends Doc> {
    * @param options - Optional settings for the command
    * @param callback - An optional callback, a Promise will be returned if none is provided
    */
-  findOne(): Promise<WithId<TSchema> | null>
-  findOne(callback: Callback<WithId<TSchema> | null>): void
-  findOne(filter: Filter<TSchema>): Promise<WithId<TSchema> | null>
-  findOne(
-    filter: Filter<TSchema>,
-    callback: Callback<WithId<TSchema> | null>
-  ): void
-  findOne(
-    filter: Filter<TSchema>,
-    options: TsFindOptions<TSchema>
-  ): Promise<WithId<TSchema> | null>
-  findOne(
-    filter: Filter<TSchema>,
-    options: TsFindOptions<TSchema>,
-    callback: Callback<WithId<TSchema> | null>
-  ): void
-  findOne<T = TSchema>(): Promise<T | null>
-  findOne<T = TSchema>(callback: Callback<T | null>): void
-  findOne<T = TSchema>(filter: Filter<TSchema>): Promise<T | null>
   findOne<T = TSchema>(
     filter: Filter<TSchema>,
     options?: TsFindOptions<TSchema>
   ): Promise<T | null>
-  findOne<T = TSchema>(
-    filter: Filter<TSchema>,
-    options?: TsFindOptions<TSchema>,
-    callback?: Callback<T | null>
-  ): void
   /**
    * Creates a cursor for a filter that can be used to iterate over results from MongoDB
    *
    * @param filter - The filter predicate. If unspecified, then all documents in the collection will match the predicate
    */
-  find(): TsFindCursor<WithId<TSchema>>
-  find(
-    filter: Filter<TSchema>,
-    options?: TsFindOptions<TSchema>
-  ): TsFindCursor<WithId<TSchema>>
-  find<T>(
+  find<T = TSchema>(
     filter: Filter<TSchema>,
     options?: TsFindOptions<TSchema>
   ): TsFindCursor<T>
@@ -227,20 +240,10 @@ export declare class SafeCollection<TSchema extends Doc> {
    * await collection.createIndex(['j', ['k', -1], { l: '2d' }])
    * ```
    */
-  createIndex(indexSpec: IndexSpecification<TSchema>): Promise<string>
   createIndex(
     indexSpec: IndexSpecification<TSchema>,
-    callback: Callback<string>
-  ): void
-  createIndex(
-    indexSpec: IndexSpecification<TSchema>,
-    options: CreateIndexesOptions
+    options?: CreateIndexesOptions
   ): Promise<string>
-  createIndex(
-    indexSpec: IndexSpecification<TSchema>,
-    options: CreateIndexesOptions,
-    callback: Callback<string>
-  ): void
   /**
    * Creates multiple indexes in the collection, this method is only supported for
    * MongoDB 2.6 or higher. Earlier version of MongoDB will throw a command not supported
@@ -273,20 +276,58 @@ export declare class SafeCollection<TSchema extends Doc> {
    * ]);
    * ```
    */
-  createIndexes(indexSpecs: IndexSpecification<TSchema>[]): Promise<string[]>
   createIndexes(
     indexSpecs: IndexSpecification<TSchema>[],
-    callback: Callback<string[]>
-  ): void
-  createIndexes(
-    indexSpecs: IndexSpecification<TSchema>[],
-    options: CreateIndexesOptions
+    options?: CreateIndexesOptions
   ): Promise<string[]>
-  createIndexes(
-    indexSpecs: IndexSpecification<TSchema>[],
-    options: CreateIndexesOptions,
-    callback: Callback<string[]>
-  ): void
+  /**
+   * Drops an index from this collection.
+   *
+   * @param indexName - Name of the index to drop.
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  dropIndex(indexName: string, options?: DropIndexesOptions): Promise<Document>
+  /**
+   * Drops all indexes from this collection.
+   *
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  dropIndexes(options?: DropIndexesOptions): Promise<Document>
+  /**
+   * Get the list of all indexes information for the collection.
+   *
+   * @param options - Optional settings for the command
+   */
+  listIndexes(options?: ListIndexesOptions): ListIndexesCursor
+  /**
+   * Checks if one or more indexes exist on the collection, fails on first non-existing index
+   *
+   * @param indexes - One or more index names to check.
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  indexExists(
+    indexes: string | string[],
+    options?: IndexInformationOptions
+  ): Promise<boolean>
+  /**
+   * Retrieves this collections index info.
+   *
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  indexInformation(options?: IndexInformationOptions): Promise<Document>
+  /**
+   * Gets an estimate of the count of documents in a collection using collection metadata.
+   *
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  estimatedDocumentCount(
+    options?: EstimatedDocumentCountOptions
+  ): Promise<number>
   /**
    * Gets the number of documents matching the filter.
    * For a fast count of the total documents in a collection see {@link Collection#estimatedDocumentCount| estimatedDocumentCount}.
@@ -313,20 +354,10 @@ export declare class SafeCollection<TSchema extends Doc> {
    * @see https://docs.mongodb.com/manual/reference/operator/query/center/#op._S_center
    * @see https://docs.mongodb.com/manual/reference/operator/query/centerSphere/#op._S_centerSphere
    */
-  countDocuments(): Promise<number>
-  countDocuments(callback: Callback<number>): void
-  countDocuments(filter: Filter<TSchema>): Promise<number>
-  countDocuments(callback: Callback<number>): void
   countDocuments(
     filter: Filter<TSchema>,
-    options: CountDocumentsOptions
+    options?: CountDocumentsOptions
   ): Promise<number>
-  countDocuments(
-    filter: Filter<TSchema>,
-    options: CountDocumentsOptions,
-    callback: Callback<number>
-  ): void
-  countDocuments(filter: Filter<TSchema>, callback: Callback<number>): void
   /**
    * The distinct command returns a list of distinct values for the given key across a collection.
    *
@@ -335,52 +366,11 @@ export declare class SafeCollection<TSchema extends Doc> {
    * @param options - Optional settings for the command
    * @param callback - An optional callback, a Promise will be returned if none is provided
    */
-  distinct<Key extends keyof WithId<TSchema>>(
-    key: Key
-  ): Promise<Array<Flatten<WithId<TSchema>[Key]>>>
-  distinct<Key extends keyof WithId<TSchema>>(
-    key: Key,
-    callback: Callback<Array<Flatten<WithId<TSchema>[Key]>>>
-  ): void
-  distinct<Key extends keyof WithId<TSchema>>(
-    key: Key,
-    filter: Filter<TSchema>
-  ): Promise<Array<Flatten<WithId<TSchema>[Key]>>>
-  distinct<Key extends keyof WithId<TSchema>>(
-    key: Key,
-    filter: Filter<TSchema>,
-    callback: Callback<Array<Flatten<WithId<TSchema>[Key]>>>
-  ): void
-  distinct<Key extends keyof WithId<TSchema>>(
-    key: Key,
-    filter: Filter<TSchema>,
-    options: DistinctOptions
-  ): Promise<Array<Flatten<WithId<TSchema>[Key]>>>
-  distinct<Key extends keyof WithId<TSchema>>(
-    key: Key,
-    filter: Filter<TSchema>,
-    options: DistinctOptions,
-    callback: Callback<Array<Flatten<WithId<TSchema>[Key]>>>
-  ): void
-  distinct(key: string): Promise<any[]>
-  distinct(key: string, callback: Callback<any[]>): void
-  distinct(key: string, filter: Filter<TSchema>): Promise<any[]>
   distinct(
     key: string,
     filter: Filter<TSchema>,
-    callback: Callback<any[]>
-  ): void
-  distinct(
-    key: string,
-    filter: Filter<TSchema>,
-    options: DistinctOptions
+    options?: DistinctOptions
   ): Promise<any[]>
-  distinct(
-    key: string,
-    filter: Filter<TSchema>,
-    options: DistinctOptions,
-    callback: Callback<any[]>
-  ): void
   /**
    * Find a document and delete it in one atomic operation. Requires a write lock for the duration of the operation.
    *
@@ -388,20 +378,10 @@ export declare class SafeCollection<TSchema extends Doc> {
    * @param options - Optional settings for the command
    * @param callback - An optional callback, a Promise will be returned if none is provided
    */
-  findOneAndDelete(filter: Filter<TSchema>): Promise<ModifyResult<TSchema>>
   findOneAndDelete(
     filter: Filter<TSchema>,
-    options: TsFindOneAndDeleteOptions<TSchema>
+    options?: TsFindOneAndDeleteOptions<TSchema>
   ): Promise<ModifyResult<TSchema>>
-  findOneAndDelete(
-    filter: Filter<TSchema>,
-    callback: Callback<ModifyResult<TSchema>>
-  ): void
-  findOneAndDelete(
-    filter: Filter<TSchema>,
-    options: TsFindOneAndDeleteOptions<TSchema>,
-    callback: Callback<ModifyResult<TSchema>>
-  ): void
   /**
    * Find a document and replace it in one atomic operation. Requires a write lock for the duration of the operation.
    *
@@ -412,24 +392,23 @@ export declare class SafeCollection<TSchema extends Doc> {
    */
   findOneAndReplace(
     filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>
+    replacement: WithoutId<TSchema>,
+    options?: TsFindOneAndReplaceOptions<TSchema>
   ): Promise<ModifyResult<TSchema>>
-  findOneAndReplace(
-    filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>,
-    callback: Callback<ModifyResult<TSchema>>
-  ): void
-  findOneAndReplace(
-    filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>,
-    options: TsFindOneAndReplaceOptions<TSchema>
-  ): Promise<ModifyResult<TSchema>>
-  findOneAndReplace(
-    filter: Filter<TSchema>,
-    replacement: WithoutId<TSchema>,
-    options: TsFindOneAndReplaceOptions<TSchema>,
-    callback: Callback<ModifyResult<TSchema>>
-  ): void
+  /**
+   * Retrieve all the indexes on the collection.
+   *
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  indexes(options?: IndexInformationOptions): Promise<Document[]>
+  /**
+   * Get all the collection statistics.
+   *
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  stats(options?: CollStatsOptions): Promise<CollStats>
   /**
    * Find a document and update it in one atomic operation. Requires a write lock for the duration of the operation.
    *
@@ -440,24 +419,9 @@ export declare class SafeCollection<TSchema extends Doc> {
    */
   findOneAndUpdate(
     filter: Filter<TSchema>,
-    update: Update<TSchema>
+    update: Update<TSchema>,
+    options?: TsFindOneAndUpdateOptions<TSchema>
   ): Promise<ModifyResult<TSchema>>
-  findOneAndUpdate(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    callback: Callback<ModifyResult<TSchema>>
-  ): void
-  findOneAndUpdate(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    options: TsFindOneAndUpdateOptions<TSchema>
-  ): Promise<ModifyResult<TSchema>>
-  findOneAndUpdate(
-    filter: Filter<TSchema>,
-    update: Update<TSchema>,
-    options: TsFindOneAndUpdateOptions<TSchema>,
-    callback: Callback<ModifyResult<TSchema>>
-  ): void
   /**
    * Execute an aggregation framework pipeline against the collection, needs MongoDB \>= 2.2
    *
@@ -468,44 +432,86 @@ export declare class SafeCollection<TSchema extends Doc> {
     pipeline?: Document[],
     options?: AggregateOptions
   ): TsAggregationCursor<T>
-  // /**
-  //  * Create a new Change Stream, watching for new changes (insertions, updates, replacements, deletions, and invalidations) in this collection.
-  //  *
-  //  * @since 3.0.0
-  //  * @param pipeline - An array of {@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/|aggregation pipeline stages} through which to pass change stream documents. This allows for filtering (using $match) and manipulating the change stream documents.
-  //  * @param options - Optional settings for the command
-  //  */
-  // watch<TLocal = TSchema>(
-  //   pipeline?: Document[],
-  //   options?: ChangeStreamOptions
-  // ): ChangeStream<TLocal>
-  // /**
-  //  * Run Map Reduce across a collection. Be aware that the inline option for out will return an array of results not a collection.
-  //  *
-  //  * @deprecated collection.mapReduce is deprecated. Use the aggregation pipeline instead. Visit https://docs.mongodb.com/manual/reference/map-reduce-to-aggregation-pipeline for more information on how to translate map-reduce operations to the aggregation pipeline.
-  //  * @param map - The mapping function.
-  //  * @param reduce - The reduce function.
-  //  * @param options - Optional settings for the command
-  //  * @param callback - An optional callback, a Promise will be returned if none is provided
-  //  */
-  // mapReduce<TKey = any, TValue = any>(
-  //   map: string | MapFunction<TSchema>,
-  //   reduce: string | ReduceFunction<TKey, TValue>
-  // ): Promise<Document | Document[]>
-  // mapReduce<TKey = any, TValue = any>(
-  //   map: string | MapFunction<TSchema>,
-  //   reduce: string | ReduceFunction<TKey, TValue>,
-  //   callback: Callback<Document | Document[]>
-  // ): void
-  // mapReduce<TKey = any, TValue = any>(
-  //   map: string | MapFunction<TSchema>,
-  //   reduce: string | ReduceFunction<TKey, TValue>,
-  //   options: MapReduceOptions<TKey, TValue>
-  // ): Promise<Document | Document[]>
-  // mapReduce<TKey = any, TValue = any>(
-  //   map: string | MapFunction<TSchema>,
-  //   reduce: string | ReduceFunction<TKey, TValue>,
-  //   options: MapReduceOptions<TKey, TValue>,
-  //   callback: Callback<Document | Document[]>
-  // ): void
+  /**
+   * Create a new Change Stream, watching for new changes (insertions, updates, replacements, deletions, and invalidations) in this collection.
+   *
+   * @since 3.0.0
+   * @param pipeline - An array of {@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/|aggregation pipeline stages} through which to pass change stream documents. This allows for filtering (using $match) and manipulating the change stream documents.
+   * @param options - Optional settings for the command
+   */
+  watch<TLocal = TSchema>(
+    pipeline?: Document[],
+    options?: ChangeStreamOptions
+  ): ChangeStream<TLocal>
+  /**
+   * Run Map Reduce across a collection. Be aware that the inline option for out will return an array of results not a collection.
+   *
+   * @deprecated collection.mapReduce is deprecated. Use the aggregation pipeline instead. Visit https://docs.mongodb.com/manual/reference/map-reduce-to-aggregation-pipeline for more information on how to translate map-reduce operations to the aggregation pipeline.
+   * @param map - The mapping function.
+   * @param reduce - The reduce function.
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  mapReduce<TKey = any, TValue = any>(
+    map: string | MapFunction<TSchema>,
+    reduce: string | ReduceFunction<TKey, TValue>,
+    options?: MapReduceOptions<TKey, TValue>
+  ): Promise<Document | Document[]>
+  initializeUnorderedBulkOp(options?: BulkWriteOptions): UnorderedBulkOperation
+  /** Initiate an In order bulk write operation. Operations will be serially executed in the order they are added, creating a new operation for each switch in types. */
+  initializeOrderedBulkOp(options?: BulkWriteOptions): OrderedBulkOperation
+  /**
+   * Inserts a single document or a an array of documents into MongoDB. If documents passed in do not contain the **_id** field,
+   * one will be added to each of the documents missing it by the driver, mutating the document. This behavior
+   * can be overridden by setting the **forceServerObjectId** flag.
+   *
+   * @deprecated Use insertOne, insertMany or bulkWrite instead.
+   * @param docs - The documents to insert
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  insert(
+    docs: OptionalUnlessRequiredId<TSchema>[],
+    options?: BulkWriteOptions
+  ): Promise<InsertManyResult<TSchema>>
+  /**
+   * Updates documents.
+   *
+   * @deprecated use updateOne, updateMany or bulkWrite
+   * @param selector - The selector for the update operation.
+   * @param update - The update operations to be applied to the documents
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  update(
+    selector: Filter<TSchema>,
+    update: Update<TSchema>,
+    options?: UpdateOptions
+  ): Promise<UpdateResult>
+  /**
+   * Remove documents.
+   *
+   * @deprecated use deleteOne, deleteMany or bulkWrite
+   * @param selector - The selector for the update operation.
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  remove(
+    selector: Filter<TSchema>,
+    options?: DeleteOptions
+  ): Promise<DeleteResult>
+  /**
+   * An estimated count of matching documents in the db to a filter.
+   *
+   * **NOTE:** This method has been deprecated, since it does not provide an accurate count of the documents
+   * in a collection. To obtain an accurate count of documents in the collection, use {@link Collection#countDocuments| countDocuments}.
+   * To obtain an estimated count of all documents in the collection, use {@link Collection#estimatedDocumentCount| estimatedDocumentCount}.
+   *
+   * @deprecated use {@link Collection#countDocuments| countDocuments} or {@link Collection#estimatedDocumentCount| estimatedDocumentCount} instead
+   *
+   * @param filter - The filter for the count.
+   * @param options - Optional settings for the command
+   * @param callback - An optional callback, a Promise will be returned if none is provided
+   */
+  count(filter: Filter<TSchema>, options?: CountOptions): Promise<number>
 }
