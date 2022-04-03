@@ -53,5 +53,15 @@
     "ts-node": "^10.4.0",
     "type-assertions": "^1.1.0",
     "typescript": "^4.5.4"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "jsxSingleQuote": true,
+    "bracketSpacing": true,
+    "useTabs": false
   }
+
 }
